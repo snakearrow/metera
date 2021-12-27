@@ -1,0 +1,7 @@
+{
+  "name": "Drive",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
