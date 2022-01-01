@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList, IonListHeader, IonItem, IonInput, IonButton, IonIcon } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList, IonListHeader, IonItem, IonInput, IonButton, IonIcon, IonModal } from '@ionic/react';
 import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
+import AddTemplateTripModal from '../components/AddTemplateTripModal';
 import { cart, briefcase, barbell, people, home, add, trash } from 'ionicons/icons';
-import { loadSettings, updateSettings, defaultSettings, loadTrips } from '../util';
+import { loadSettings, updateSettings, defaultSettings, loadTrips, saveTemplateTrip } from '../util';
 import './Tab2.css';
 
 const Tab2: React.FC = () => {
@@ -12,6 +13,17 @@ const Tab2: React.FC = () => {
   const [kmPerYear, setKmPerYear] = useState<number>(10000);
   const [totalYears, setTotalYears] = useState<number>(4);
   const [trips, setTrips] = useState(null as Trip[] | null);
+  const [showAddTripModal, setShowAddTripModal] = useState(false);
+  
+  async function closeAddTripModal(args: any) {
+    if (args !== undefined) {
+      let name = args[0];
+      let description = (args[1] === undefined ? "" : args[1]);
+      let km = args[2];
+      saveTemplateTrip(name, description, km);
+    }
+    await setShowAddTripModal(false);
+  }
   
   const handleKmPerYearChanged = async(e: any) => {
     const kmBudget = +e.detail.value;
@@ -107,7 +119,7 @@ const Tab2: React.FC = () => {
        <IonList>
         <IonListHeader class="label-heading">Trips</IonListHeader>
          <IonItem>
-            <IonButton color="success" style={{width:80, height: 30}}>Add&nbsp;
+            <IonButton color="success" style={{width:80, height: 30}} onClick={() => setShowAddTripModal(true)}>Add&nbsp;
               <IonIcon icon={add}></IonIcon>
             </IonButton>
           </IonItem>
@@ -139,6 +151,10 @@ const Tab2: React.FC = () => {
           </IonButton>
         </IonItem>
       </IonList>
+      
+      <IonModal isOpen={showAddTripModal}>
+        <AddTemplateTripModal closeAction={closeAddTripModal}></AddTemplateTripModal>
+      </IonModal>
      </IonContent>
     </IonPage>
   );

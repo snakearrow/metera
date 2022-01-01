@@ -1,5 +1,5 @@
 export interface Trip {
-    distance: number;
+    kilometers: number;
     name: string;
     description: string;
 }

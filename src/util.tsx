@@ -40,6 +40,15 @@ export function buildSettings(budgetPerYear: number, totalYears: number): Settin
     return settings;
 };
 
+export function buildTrip(name: string, description: any, kilometers: number): Trip {
+  let trip: Trip = {
+    kilometers: kilometers,
+    name: name,
+    description: description
+  };
+  return trip;
+}
+
 export const loadTrips = async (): Promise<Trip[] | null> => {
     const trips = await Storage.get({
         key: 'trips',
@@ -48,4 +57,13 @@ export const loadTrips = async (): Promise<Trip[] | null> => {
         ? JSON.parse(trips.value)
         : null;
 };
+
+export const saveTemplateTrip = async (name: string, description: any, kilometers: number): Promise<Trip | null> => {
+  const trip = buildTrip(name, description, kilometers);
+  await Storage.set({
+            key: 'trip',
+            value: JSON.stringify(trip)
+        });
+    return trip;
+}
 
