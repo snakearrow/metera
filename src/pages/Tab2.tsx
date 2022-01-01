@@ -2,17 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList, IonListHeader, IonItem, IonInput, IonButton, IonIcon } from '@ionic/react';
 import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
-import { cart, briefcase, barbell, people, home } from 'ionicons/icons';
+import { cart, briefcase, barbell, people, home, add, trash } from 'ionicons/icons';
 import { loadSettings, updateSettings, defaultSettings, loadTrips } from '../util';
 import './Tab2.css';
 
 const Tab2: React.FC = () => {
 
   const [settings, setSettings] = useState(null as Settings | null);
+  const [kmPerYear, setKmPerYear] = useState<number>(10000);
+  const [totalYears, setTotalYears] = useState<number>(4);
   const [trips, setTrips] = useState(null as Trip[] | null);
   
-  const handleChange = async(e: any) => {
-    updateSettings(+e.detail.value).then((result) => {
+  const handleKmPerYearChanged = async(e: any) => {
+    const kmBudget = +e.detail.value;
+    setKmPerYear(kmBudget);
+    updateSettings(kmBudget, totalYears!).then((result) => {
+      if (result) {
+        console.log(result);
+        setSettings(result);
+      } else {
+        console.log("failed to save settings");
+      }
+    });
+  };
+  
+  const handleTotalYearsChanged = async(e: any) => {
+    let years = +e.detail.value;
+    setTotalYears(years);
+    updateSettings(kmPerYear, years).then((result) => {
       if (result) {
         console.log(result);
         setSettings(result);
@@ -28,13 +45,7 @@ const Tab2: React.FC = () => {
         setSettings(result);
       } else {
         console.log("no settings founds, initializing with empty");
-        defaultSettings().then((result) => {
-            if (result) {
-              setSettings(result);
-            } else {
-              console.log("failed to initialize with empty settings");
-            }
-        })
+        setSettings(defaultSettings());
       }
     })
   };
@@ -64,28 +75,41 @@ const Tab2: React.FC = () => {
         </IonHeader>
         {(settings) && (
             <IonList>
-              <IonItem>
-                <IonLabel position="fixed">Budget p.a.:</IonLabel>
-                <IonInput placeholder={settings.budgetPerYear.toString()} onIonChange={e => handleChange(e)}></IonInput>
+              <IonListHeader class="label-heading">General</IonListHeader>
+              
+              <IonItem lines="none">
+                <IonLabel>Kilometer p.a.:</IonLabel>
+                <IonInput type="number" placeholder={settings.budgetPerYear.toString()} onIonChange={e => handleKmPerYearChanged(e)} value={kmPerYear} ></IonInput>
                 <IonLabel>km</IonLabel>
               </IonItem>
-              <IonItem>
+              <IonItem lines="none">
+                <IonLabel position="fixed">Years:</IonLabel>
+                <IonInput type="number" placeholder={settings.totalYears.toString()} onIonChange={e => handleTotalYearsChanged(e)} value={totalYears}></IonInput>
+              </IonItem>
+              <IonItem lines="none">
+                <IonLabel position="fixed">Total:</IonLabel>
+                <IonInput placeholder={settings.totalYears.toString()} readonly={true} value={totalYears * kmPerYear}></IonInput>
+                <IonLabel>km</IonLabel>
+              </IonItem>
+              <IonItem lines="none">
                 <IonLabel position="fixed">Per month:</IonLabel>
-                <IonInput> {(settings.budgetPerYear/12).toFixed(2).toString()}</IonInput>
+                <IonInput value={(settings.budgetPerYear/12).toFixed(2).toString()} readonly={true}></IonInput>
                 <IonLabel>km</IonLabel>
               </IonItem>
-              <IonItem>
+              <IonItem lines="none">
                 <IonLabel position="fixed">Per day:</IonLabel>
-                <IonInput> {(settings.budgetPerYear/12/30).toFixed(2).toString()}</IonInput>
+                <IonInput value={(settings.budgetPerYear/12/30).toFixed(2).toString()}></IonInput>
                 <IonLabel>km</IonLabel>
               </IonItem>
             </IonList>
        )}
        
        <IonList>
-        <IonListHeader>Trips</IonListHeader>
+        <IonListHeader class="label-heading">Trips</IonListHeader>
          <IonItem>
-            <IonButton color="success">Add</IonButton>
+            <IonButton color="success" style={{width:80, height: 30}}>Add&nbsp;
+              <IonIcon icon={add}></IonIcon>
+            </IonButton>
           </IonItem>
          <IonItem>
             <IonIcon slot="start" icon={cart}/>
@@ -108,9 +132,11 @@ const Tab2: React.FC = () => {
        </IonList>
         
        <IonList>
-        <IonListHeader>Danger Zone</IonListHeader>
+        <IonListHeader class="label-heading">Danger Zone</IonListHeader>
         <IonItem>
-          <IonButton color="danger">Reset All</IonButton>
+          <IonButton color="danger" style={{width: 120, height: 30}}>Reset All&nbsp;
+            <IonIcon icon={trash}></IonIcon>
+          </IonButton>
         </IonItem>
       </IonList>
      </IonContent>

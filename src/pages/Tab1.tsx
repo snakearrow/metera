@@ -6,7 +6,7 @@ import { add } from 'ionicons/icons';
 import AddTripModal from '../components/AddTripModal';
 import InitialSetupModal from '../components/InitialSetupModal';
 import { Settings } from '../interfaces/settings';
-import { loadSettings } from '../util';
+import { loadSettings,  updateSettings } from '../util';
 import { getNumberOfDaysInCurrentMonth, getDaysInMonth } from '../dateutils';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
@@ -55,9 +55,10 @@ const Tab1: React.FC = () => {
   
   async function closeFirstTimeUsingAppModal(args: any) {
     if (args !== undefined) {
-      console.log(args);
-      let totalBudget = args[0];
-      let totalYears = args[1];
+      // we got some initial data to save
+      let budgetPerYear = parseFloat(args[0]);
+      let totalYears = parseInt(args[1]);
+      updateSettings(budgetPerYear, totalYears);
     }
     setFirstTimeUsingApp(false);
   }

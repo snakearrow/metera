@@ -9,7 +9,7 @@ type InitialSetupModalProps = {
 }
 
 type InitialSetupModalState = {
-  totalKm: number,
+  kmPerYear: number,
   totalYears: number;
 }
 
@@ -18,7 +18,7 @@ class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialS
   constructor(props: any) {
     super(props)
     this.state ={
-      totalKm: 10000,
+      kmPerYear: 10000,
       totalYears: 4
     }
   }
@@ -44,8 +44,8 @@ class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialS
           <IonLabel>or enter some initial data and start using the App:</IonLabel>
           <IonList>
             <IonItem lines="none">
-              <IonLabel position="stacked">Total Kilometer Budget:</IonLabel>
-              <IonInput value={this.state.totalKm} placeholder="10000" type="number"></IonInput>
+              <IonLabel position="stacked">Kilometer Budger p.a.:</IonLabel>
+              <IonInput value={this.state.kmPerYear} placeholder="10000" type="number"></IonInput>
             </IonItem>
             <IonItem lines="none">
               <IonLabel position="stacked">Years:</IonLabel>
@@ -53,7 +53,7 @@ class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialS
             </IonItem>
           </IonList>
           <div style={{padding:10, textAlign:'center'}}>
-              <IonButton color="success" style={{height:40, width: 120}} onClick={() => this.props.closeAction([this.state.totalKm, this.state.totalYears])}>Start</IonButton>
+              <IonButton color="success" style={{height:40, width: 120}} onClick={() => this.props.closeAction([this.state.kmPerYear, this.state.totalYears])}>Start</IonButton>
           </div>
         </IonContent>
     </>

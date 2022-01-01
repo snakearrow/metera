@@ -3,29 +3,39 @@ import { Settings } from './interfaces/settings';
 import { Trip } from './interfaces/trip';
 
 export const loadSettings = async (): Promise<Settings | null> => {
-    const budgetPerYear = await Storage.get({
+    const settings = await Storage.get({
         key: 'settings',
     });
-    return (budgetPerYear && budgetPerYear.value)
-        ? JSON.parse(budgetPerYear.value)
+    return (settings && settings.value)
+        ? JSON.parse(settings.value)
         : null;
 };
 
-export const updateSettings = async (budgetPerYear: number): Promise<Settings | null> => {
-    let settings: Settings = {
-        budgetPerYear: budgetPerYear
-    };
-    
+export const updateSettings = async (budgetPerYear: number, totalYears: number): Promise<Settings | null> => {
+    const settings = buildSettings(budgetPerYear, totalYears);
     await Storage.set({
             key: 'settings',
-            value: JSON.stringify(settings),
+            value: JSON.stringify(settings)
         });
     return settings;
 };
 
-export const defaultSettings = async (): Promise<Settings | null> => {
+export function defaultSettings(): Settings {
     let settings: Settings = {
-        budgetPerYear: 0
+        budgetPerYear: 0,
+        totalBudget: 0,
+        totalYears: 0
+    };
+    return settings;
+};
+
+export function buildSettings(budgetPerYear: number, totalYears: number): Settings {
+    let totalBudget = budgetPerYear * totalYears;
+    
+    let settings: Settings = {
+        budgetPerYear: budgetPerYear,
+        totalBudget: totalBudget,
+        totalYears: totalYears
     };
     return settings;
 };
