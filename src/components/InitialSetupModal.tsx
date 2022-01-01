@@ -1,13 +1,27 @@
 import React from 'react';
 import { IonHeader, IonContent, IonToolbar, IonTitle, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow } from '@ionic/react';
 import { happy } from 'ionicons/icons';
+import { Settings } from '../interfaces/settings';
 import './InitialSetupModal.css';
 
 type InitialSetupModalProps = {
   closeAction: Function;
 }
 
-class InitialSetupModal extends React.Component<InitialSetupModalProps> {
+type InitialSetupModalState = {
+  totalKm: number,
+  totalYears: number;
+}
+
+class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialSetupModalState> {
+
+  constructor(props: any) {
+    super(props)
+    this.state ={
+      totalKm: 10000,
+      totalYears: 4
+    }
+  }
 
   render() {
     return <>
@@ -31,15 +45,15 @@ class InitialSetupModal extends React.Component<InitialSetupModalProps> {
           <IonList>
             <IonItem lines="none">
               <IonLabel position="stacked">Total Kilometer Budget:</IonLabel>
-              <IonInput placeholder="10000" type="number"></IonInput>
+              <IonInput value={this.state.totalKm} placeholder="10000" type="number"></IonInput>
             </IonItem>
             <IonItem lines="none">
               <IonLabel position="stacked">Years:</IonLabel>
-              <IonInput placeholder="4" type="number"></IonInput>
+              <IonInput value={this.state.totalYears} placeholder="4" type="number"></IonInput>
             </IonItem>
           </IonList>
           <div style={{padding:10, textAlign:'center'}}>
-              <IonButton color="success" style={{height:40, width: 120}}>Start</IonButton>
+              <IonButton color="success" style={{height:40, width: 120}} onClick={() => this.props.closeAction([this.state.totalKm, this.state.totalYears])}>Start</IonButton>
           </div>
         </IonContent>
     </>

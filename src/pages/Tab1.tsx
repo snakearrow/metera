@@ -53,7 +53,12 @@ const Tab1: React.FC = () => {
     await setShowAddTripModal(false);
   }
   
-  async function closeFirstTimeUsingAppModal() {
+  async function closeFirstTimeUsingAppModal(args: any) {
+    if (args !== undefined) {
+      console.log(args);
+      let totalBudget = args[0];
+      let totalYears = args[1];
+    }
     setFirstTimeUsingApp(false);
   }
   
