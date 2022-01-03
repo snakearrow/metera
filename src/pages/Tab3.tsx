@@ -3,7 +3,7 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList
   IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardHeader, IonCardContent, IonCardTitle, IonCardSubtitle, IonRow, IonGrid, IonCol } from '@ionic/react';
 import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
-import { loadSettings, updateSettings, defaultSettings, loadTrips } from '../util';
+import { loadSettings, updateSettings, defaultSettings } from '../util';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
 import './Tab3.css';

@@ -3,26 +3,26 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList
 import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
 import AddTemplateTripModal from '../components/AddTemplateTripModal';
-import { cart, briefcase, barbell, people, home, add, trash } from 'ionicons/icons';
-import { loadSettings, updateSettings, defaultSettings, loadTrips, saveTemplateTrip } from '../util';
+import { cart, briefcase, barbell, people, home, add, trash, car } from 'ionicons/icons';
+import { loadSettings, updateSettings, defaultSettings, loadTemplateTrips, saveTemplateTrip, getIconForKeyword, deleteTemplateTripByName } from '../util';  
 import './Tab2.css';
-
+ 
 const Tab2: React.FC = () => {
 
   const [settings, setSettings] = useState(null as Settings | null);
   const [kmPerYear, setKmPerYear] = useState<number>(10000);
   const [totalYears, setTotalYears] = useState<number>(4);
-  const [trips, setTrips] = useState(null as Trip[] | null);
-  const [showAddTripModal, setShowAddTripModal] = useState(false);
+  const [templateTrips, setTemplateTrips] = useState(null as Trip[] | null);
+  const [showAddTemplateTripModal, setShowAddTemplateTripModal] = useState(false);
   
-  async function closeAddTripModal(args: any) {
+  async function closeAddTemplateTripModal(args: any) {
     if (args !== undefined) {
       let name = args[0];
       let description = (args[1] === undefined ? "" : args[1]);
       let km = args[2];
       saveTemplateTrip(name, description, km);
     }
-    await setShowAddTripModal(false);
+    await setShowAddTemplateTripModal(false);
   }
   
   const handleKmPerYearChanged = async(e: any) => {
@@ -52,7 +52,7 @@ const Tab2: React.FC = () => {
   };
   
   const applySettings = (): void => {
-    loadSettings().then((result) => {
+    loadSettings().then((result) => { 
       if (result) {
         setSettings(result);
       } else {
@@ -62,19 +62,63 @@ const Tab2: React.FC = () => {
     })
   };
   
-  const getTrips = (): void => {
-    loadTrips().then((result) => {
+  const getTemplateTrips = (): void => {
+    loadTemplateTrips().then((result) => {
         if (result) {
-          setTrips(result);
+          setTemplateTrips(result);
         } else {
-          console.log("could not load trips");
+          console.log("could not load template trips");
         }
     })
   };
   
+  const deleteTemplateTrip = async(name: string) => {
+    deleteTemplateTripByName(name).then(result => {
+      if (result) {
+        setTemplateTrips(result);
+        console.log("set template trips after delete");
+      } else {
+      // FIXME
+        console.log("template trips is null"); 
+      }
+    });
+  }
+  
+  function buildTemplateTripsList() {
+    console.log(templateTrips);
+    
+    if (templateTrips === null || templateTrips!.length <= 0) {
+      return (
+        <IonItem>
+          <IonLabel>No trips found</IonLabel>
+        </IonItem>
+      );
+    }
+    
+    let items: any[] = [];
+    for (let i = 0; i < templateTrips!.length; i++) {
+      const trip = templateTrips[i];
+      const _icon = getIconForKeyword(trip.name);
+      items.push(
+        <IonItem>
+          <IonIcon slot="start" icon={_icon}/>
+            <IonLabel>
+              <h2>{trip.name}</h2>
+              <h3>{trip.description}</h3>
+              <p>{trip.kilometers}km</p>
+            </IonLabel>
+            <IonButton slot="end" onClick={() => deleteTemplateTrip(trip.name)}>Delete</IonButton>
+          </IonItem>);
+    }
+    
+    return (
+      items
+    );
+  }
+  
   useEffect(() => {
     applySettings();
-    getTrips();
+    getTemplateTrips();
   }, [])
 
   return (
@@ -96,7 +140,7 @@ const Tab2: React.FC = () => {
               </IonItem>
               <IonItem lines="none">
                 <IonLabel position="fixed">Years:</IonLabel>
-                <IonInput type="number" placeholder={settings.totalYears.toString()} onIonChange={e => handleTotalYearsChanged(e)} value={totalYears}></IonInput>
+                <IonInput type="number" placeholder={settings.totalYears.toString()} onIonChange={e => handleTotalYearsChanged(e)} value={totalYears}></IonInput> 
               </IonItem>
               <IonItem lines="none">
                 <IonLabel position="fixed">Total:</IonLabel>
@@ -119,28 +163,12 @@ const Tab2: React.FC = () => {
        <IonList>
         <IonListHeader class="label-heading">Trips</IonListHeader>
          <IonItem>
-            <IonButton color="success" style={{width:80, height: 30}} onClick={() => setShowAddTripModal(true)}>Add&nbsp;
+            <IonButton color="success" style={{width:80, height: 30}} onClick={() => setShowAddTemplateTripModal(true)}>Add&nbsp;
               <IonIcon icon={add}></IonIcon>
             </IonButton>
           </IonItem>
-         <IonItem>
-            <IonIcon slot="start" icon={cart}/>
-            <IonLabel>
-              <h2>Shopping</h2>
-              <h3>Netto Salem</h3>
-              <p>5km</p>
-            </IonLabel>
-            <IonButton slot="end">Delete</IonButton>
-          </IonItem>
-          <IonItem>
-            <IonIcon slot="start" icon={briefcase}/>
-            <IonLabel>
-              <h2>Work</h2>
-              <h3>Diehl Ueberlingen</h3>
-              <p>22km</p>
-            </IonLabel>
-            <IonButton slot="end">Delete</IonButton>
-          </IonItem>
+          
+          {buildTemplateTripsList()}
        </IonList>
         
        <IonList>
@@ -152,8 +180,8 @@ const Tab2: React.FC = () => {
         </IonItem>
       </IonList>
       
-      <IonModal isOpen={showAddTripModal}>
-        <AddTemplateTripModal closeAction={closeAddTripModal}></AddTemplateTripModal>
+      <IonModal isOpen={showAddTemplateTripModal}>
+        <AddTemplateTripModal closeAction={closeAddTemplateTripModal}></AddTemplateTripModal>
       </IonModal>
      </IonContent>
     </IonPage>
