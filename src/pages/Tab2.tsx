@@ -23,10 +23,7 @@ const Tab2: React.FC = () => {
       let km = args[2];
       saveTemplateTrip(name, description, km).then((result) => {
         if (result) {
-          console.log("ok"); 
           setTemplateTrips(result);
-        } else {
-          console.log("null");
         }
       });
     }
@@ -63,6 +60,8 @@ const Tab2: React.FC = () => {
     loadSettings().then((result) => { 
       if (result) {
         setSettings(result);
+        setKmPerYear(result.budgetPerYear);
+        setTotalYears(result.totalYears);
       } else {
         console.log("no settings founds, initializing with empty");
         setSettings(defaultSettings());
@@ -131,7 +130,7 @@ const Tab2: React.FC = () => {
             <IonTitle size="large">Settings</IonTitle>
           </IonToolbar>
         </IonHeader>
-        {(settings) && (
+        {settings && (
             <IonList>
               <IonListHeader class="label-heading">General</IonListHeader>
               

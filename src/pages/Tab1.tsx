@@ -6,7 +6,8 @@ import { add } from 'ionicons/icons';
 import AddTripModal from '../components/AddTripModal';
 import InitialSetupModal from '../components/InitialSetupModal';
 import { Settings } from '../interfaces/settings';
-import { loadSettings,  updateSettings, initStatistics } from '../util';
+import { Stats } from '../interfaces/stats';
+import { loadSettings,  updateSettings, initStatistics, saveCustomTrip, loadStatistics, getBudgetLeftToday, getBudgetLeftMonth, saveMileageTrip } from '../util';
 import { getNumberOfDaysInCurrentMonth, getDaysInMonth } from '../dateutils';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
@@ -15,6 +16,7 @@ import './Tab1.css';
 const Tab1: React.FC = () => {
 
   const [settings, setSettings] = useState(null as Settings | null);
+  const [stats, setStats] = useState(null as Stats | null);
   const [curMonth, setCurrentMonth] = useState<string>();
   const [showAddTripModal, setShowAddTripModal] = useState(false);
   
@@ -23,6 +25,7 @@ const Tab1: React.FC = () => {
   const [leftMonth, setLeftMonth] = useState<number>();
   const [leftYear, setLeftYear] = useState<number>();
   const [leftTotal, setLeftTotal] = useState<number>();
+  const [budgetMonth, setBudgetMonth] = useState<number>();
   const [usePercent, setUsePercent] = useState<boolean>(true);
   const [firstTimeUsingApp, setFirstTimeUsingApp] = useState<boolean>(false);
   
@@ -35,18 +38,28 @@ const Tab1: React.FC = () => {
   
   const kmLeftTotal = 39242.5;
   const kmLeftYear = 6120.3;
-  const kmLeftMonth = 413.9;
-  const kmLeftDay = 9.2;
   
-  const update = async() => {
+  const update = async(statistics: Stats) => {
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('en', { month: 'long' });
     const month = formatter.format(now);
+    
     setCurrentMonth(month);
+    /*
     setLeftMonth(kmLeftMonth);
     setLeftYear(kmLeftYear);
     setLeftTotal(kmLeftTotal);
-    setLeftDay(kmLeftDay);
+    console.log("update");*/
+    
+    loadSettings().then(settings => {
+      if (settings && statistics !== null) {
+        const leftToday = getBudgetLeftToday(statistics, settings);
+        const leftMonth = getBudgetLeftMonth(statistics, settings);
+        setLeftDay(leftToday);
+        setLeftMonth(leftMonth);
+      }
+    });
+    
   };
   
   async function closeAddTripModal(args: any) {
@@ -54,6 +67,32 @@ const Tab1: React.FC = () => {
       const type = args[0];
       console.log("adding new trip with type: " + type);
       console.log("args = " + args);
+      
+      if (type === "custom") {
+        const name = args[1];
+        const description = args[2];
+        // TODO: what to do with name + description ?
+        const kilometers = parseInt(args[3]);
+        await saveCustomTrip(name, description, kilometers).then(result => {
+          if (result) {
+            setStats(result);
+            update(result);
+          }
+        });
+      }
+      
+      else if (type === "mileage") {
+        const mileage = args[1];
+        if (stats) {
+          const kmTrip = mileage - stats.mileage;
+          await saveMileageTrip(kmTrip).then(result => {
+            if (result){
+              setStats(result);
+              update(result);
+            }
+          });
+        }
+      }
     }
     await setShowAddTripModal(false);
   }
@@ -135,16 +174,26 @@ const Tab1: React.FC = () => {
       if (result) {
         console.log("settings found");
         setSettings(result);
+        setBudgetMonth(result.budgetPerYear / 12.0);
       } else {
         console.log("no settings found");
         setFirstTimeUsingApp(true);
       }
     })
   };
+  
+  const getStatistics = (): void => {
+    loadStatistics().then(result => {
+      if (result) {
+        setStats(result);
+        update(result);
+      }
+    })
+  };
 
   useEffect(() => {
     getSettings();
-    update();
+    getStatistics();
   }, [])
   
   return (
@@ -167,10 +216,12 @@ const Tab1: React.FC = () => {
         </IonToolbar>
         
         <IonList>
+          {stats && leftDay && (
           <IonItem lines="none">
-            <IonText>Left today: {kmLeftDay}km</IonText>
-            <IonProgressBar color="secondary" value={1.0/kmBudgetDay*kmLeftDay}></IonProgressBar>
+            <IonText>Left today: {leftDay.toFixed(2)}km</IonText>
+            <IonProgressBar color="secondary" value={1.0/kmBudgetDay*leftDay}></IonProgressBar>
           </IonItem>
+          )}
           
           <IonItem lines="none">
             <IonGrid>
@@ -181,9 +232,11 @@ const Tab1: React.FC = () => {
               </IonRow>
               <IonRow>
                 <IonCol>
+                  {stats && leftMonth && budgetMonth && (
                   <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>
-                      {buildProgressCircle(kmLeftMonth!, kmBudgetMonth, 3)}
+                      {buildProgressCircle(leftMonth!, budgetMonth, 3)}
                    </div>
+                   )}
                  </IonCol>
                  <IonCol>
                    <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>

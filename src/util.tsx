@@ -127,7 +127,6 @@ export const deleteTemplateTripByName = async(name: string): Promise<Trip[] | nu
             value: JSON.stringify(newTrips)
           });
           return newTrips;
-          break;
         }
       }
     }
@@ -164,3 +163,78 @@ export const loadStatistics = async(): Promise<Stats | null> => {
     : null;
 }
 
+export const saveStatistics = async(statistics: Stats) => {
+  await Storage.set({
+    key: 'statistics',
+    value: JSON.stringify(statistics)
+  });
+}
+
+export const saveCustomTrip = async(name: any, description: any, kilometers: number): Promise<Stats | null> => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const day = now.getDate();
+  let newStats = null;
+  
+  console.log("save trip with kilometers: " + kilometers);
+  await loadStatistics().then(stats => {
+    if (stats) {
+      const newMileage = stats.mileage + kilometers;
+      const monthStats = stats.monthStats;
+      for (let i = 0; i < monthStats.length; i++) {
+        let monthStat = monthStats[i];
+        if (monthStat.year === year && monthStat.month === month) {
+          monthStat.kilometers[day] += kilometers;
+          newStats = stats;
+          newStats.mileage = newMileage;
+          newStats.monthStats[i] = monthStat;
+          saveStatistics(newStats);
+          return newStats;
+        }
+      }
+    }
+  });
+  return newStats;
+}
+
+export const saveMileageTrip = async(kmTrip: number): Promise<Stats | null> => {
+  let newStats = await saveCustomTrip(null, null, kmTrip);
+  return newStats;
+}
+
+export function getBudgetLeftToday(stats: Stats, settings: Settings): number {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const day = now.getDate();
+  
+  const budgetPerMonth = settings.budgetPerYear / 12.0;
+  const budgetPerDay = budgetPerMonth / getNumberOfDaysInCurrentMonth();
+  
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    if (monthStat.year === year && monthStat.month === month) {
+      const kilometersToday = monthStat.kilometers[day];
+      return budgetPerDay - kilometersToday;
+      break;
+    }
+  }
+  return budgetPerDay;
+}
+
+export function getBudgetLeftMonth(stats: Stats, settings: Settings): number {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  
+  const budgetPerMonth = settings.budgetPerYear / 12.0;
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    if (monthStat.year === year && monthStat.month === month) {
+      return monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
+      break;
+    }
+  }
+  return budgetPerMonth;
+}
