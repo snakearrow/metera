@@ -7,7 +7,8 @@ import AddTripModal from '../components/AddTripModal';
 import InitialSetupModal from '../components/InitialSetupModal';
 import { Settings } from '../interfaces/settings';
 import { Stats } from '../interfaces/stats';
-import { loadSettings,  updateSettings, initStatistics, saveCustomTrip, loadStatistics, getBudgetLeftToday, getBudgetLeftMonth, saveMileageTrip } from '../util';
+import { loadSettings,  updateSettings, initStatistics, saveCustomTrip, loadStatistics, getBudgetLeftToday, getBudgetLeftMonth, saveMileageTrip,
+ getBudgetLeftTotal, getBudgetLeftYear } from '../util';
 import { getNumberOfDaysInCurrentMonth, getDaysInMonth } from '../dateutils';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
@@ -25,38 +26,32 @@ const Tab1: React.FC = () => {
   const [leftMonth, setLeftMonth] = useState<number>();
   const [leftYear, setLeftYear] = useState<number>();
   const [leftTotal, setLeftTotal] = useState<number>();
+  
+  const [budgetDay, setBudgetDay] = useState<number>();
   const [budgetMonth, setBudgetMonth] = useState<number>();
+  const [budgetYear, setBudgetYear] = useState<number>();
+  const [budgetTotal, setBudgetTotal] = useState<number>();
   const [usePercent, setUsePercent] = useState<boolean>(true);
-  const [firstTimeUsingApp, setFirstTimeUsingApp] = useState<boolean>(false);
+  const [firstTimeUsingApp, setFirstTimeUsingApp] = useState<boolean>(false); 
   
-   // TODO: get some of these from settings
-  const kmBudgetTotal = 42500.0;
-  const totalYears = 4;
-  const kmBudgetYear = kmBudgetTotal / totalYears;
-  const kmBudgetMonth = kmBudgetYear / 12.0;
-  const kmBudgetDay = kmBudgetMonth / getNumberOfDaysInCurrentMonth();
-  
-  const kmLeftTotal = 39242.5;
-  const kmLeftYear = 6120.3;
-  
+
   const update = async(statistics: Stats) => {
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('en', { month: 'long' });
     const month = formatter.format(now);
     
     setCurrentMonth(month);
-    /*
-    setLeftMonth(kmLeftMonth);
-    setLeftYear(kmLeftYear);
-    setLeftTotal(kmLeftTotal);
-    console.log("update");*/
-    
+
     loadSettings().then(settings => {
       if (settings && statistics !== null) {
         const leftToday = getBudgetLeftToday(statistics, settings);
         const leftMonth = getBudgetLeftMonth(statistics, settings);
+        const leftTotal = getBudgetLeftTotal(statistics, settings);
+        const leftYear = getBudgetLeftYear(statistics, settings);
         setLeftDay(leftToday);
         setLeftMonth(leftMonth);
+        setLeftTotal(leftTotal);
+        setLeftYear(leftYear);
       }
     });
     
@@ -175,6 +170,9 @@ const Tab1: React.FC = () => {
         console.log("settings found");
         setSettings(result);
         setBudgetMonth(result.budgetPerYear / 12.0);
+        setBudgetDay(result.budgetPerYear / 12.0 / getNumberOfDaysInCurrentMonth());
+        setBudgetTotal(result.totalBudget);
+        setBudgetYear(result.budgetPerYear);
       } else {
         console.log("no settings found");
         setFirstTimeUsingApp(true);
@@ -216,10 +214,10 @@ const Tab1: React.FC = () => {
         </IonToolbar>
         
         <IonList>
-          {stats && leftDay && (
+          {stats && leftDay && budgetDay && (
           <IonItem lines="none">
             <IonText>Left today: {leftDay.toFixed(2)}km</IonText>
-            <IonProgressBar color="secondary" value={1.0/kmBudgetDay*leftDay}></IonProgressBar>
+            <IonProgressBar color="secondary" value={1.0/budgetDay*leftDay}></IonProgressBar>
           </IonItem>
           )}
           
@@ -239,14 +237,18 @@ const Tab1: React.FC = () => {
                    )}
                  </IonCol>
                  <IonCol>
+                   {stats && leftYear && budgetYear && (
                    <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>
-                      {buildProgressCircle(kmLeftYear!, kmBudgetYear, 3)}
+                      {buildProgressCircle(leftYear!, budgetYear, 3)}
                    </div>
+                   )}
                  </IonCol>
                  <IonCol>
+                   {stats && leftTotal && budgetTotal && (
                    <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>
-                      {buildProgressCircle(kmLeftTotal!, kmBudgetTotal, 2)}
+                      {buildProgressCircle(leftTotal!, budgetTotal, 2)}
                    </div>
+                   )}
                  </IonCol>
                </IonRow>
              </IonGrid>

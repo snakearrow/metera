@@ -238,3 +238,27 @@ export function getBudgetLeftMonth(stats: Stats, settings: Settings): number {
   }
   return budgetPerMonth;
 }
+
+export function getBudgetLeftYear(stats: Stats, settings: Settings): number {
+  const now = new Date();
+  const year = now.getFullYear();
+  let sum = 0.0;
+  
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    if (monthStat.year === year) {
+      sum += monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
+      break;
+    }
+  }
+  return settings.budgetPerYear - sum;
+}
+
+export function getBudgetLeftTotal(stats: Stats, settings: Settings): number {
+  let sum = 0.0;
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    sum += monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
+  }
+  return settings.totalBudget - sum;
+}
