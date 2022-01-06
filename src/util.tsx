@@ -155,3 +155,12 @@ export const initStatistics = async(mileage: number): Promise<Stats | null> => {
   return statistics;
 }
 
+export const loadStatistics = async(): Promise<Stats | null> => {
+  const stats = await Storage.get({
+    key: 'statistics'
+  });
+  return (stats && stats.value)
+    ? JSON.parse(stats.value)
+    : null;
+}
+

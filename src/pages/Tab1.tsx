@@ -49,7 +49,12 @@ const Tab1: React.FC = () => {
     setLeftDay(kmLeftDay);
   };
   
-  async function closeAddTripModal() {
+  async function closeAddTripModal(args: any) {
+    if (args !== undefined) {
+      const type = args[0];
+      console.log("adding new trip with type: " + type);
+      console.log("args = " + args);
+    }
     await setShowAddTripModal(false);
   }
   
@@ -59,7 +64,6 @@ const Tab1: React.FC = () => {
       let budgetPerYear = parseFloat(args[0]);
       let totalYears = parseInt(args[1]);
       let mileage = parseInt(args[2]);
-      console.log("milage: " + mileage);
       updateSettings(budgetPerYear, totalYears);
       initStatistics(mileage);
     }

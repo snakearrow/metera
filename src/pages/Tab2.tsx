@@ -4,7 +4,8 @@ import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
 import AddTemplateTripModal from '../components/AddTemplateTripModal';
 import { cart, briefcase, barbell, people, home, add, trash, car } from 'ionicons/icons';
-import { loadSettings, updateSettings, defaultSettings, loadTemplateTrips, saveTemplateTrip, getIconForKeyword, deleteTemplateTripByName } from '../util';  
+import { loadSettings, updateSettings, defaultSettings, loadTemplateTrips, saveTemplateTrip, 
+  getIconForKeyword, deleteTemplateTripByName, loadStatistics } from '../util';  
 import './Tab2.css';
  
 const Tab2: React.FC = () => {
@@ -153,7 +154,7 @@ const Tab2: React.FC = () => {
                 <IonInput value={(settings.budgetPerYear/12).toFixed(2).toString()} readonly={true}></IonInput>
                 <IonLabel>km</IonLabel>
               </IonItem>
-              <IonItem lines="none">
+              <IonItem>
                 <IonLabel position="fixed">Per day:</IonLabel>
                 <IonInput value={(settings.budgetPerYear/12/30).toFixed(2).toString()}></IonInput>
                 <IonLabel>km</IonLabel>
@@ -163,7 +164,7 @@ const Tab2: React.FC = () => {
        
        <IonList>
         <IonListHeader class="label-heading">Trips</IonListHeader>
-         <IonItem>
+         <IonItem lines="none">
             <IonButton color="success" style={{width:80, height: 30}} onClick={() => setShowAddTemplateTripModal(true)}>Add&nbsp;
               <IonIcon icon={add}></IonIcon>
             </IonButton>
@@ -174,7 +175,7 @@ const Tab2: React.FC = () => {
         
        <IonList>
         <IonListHeader class="label-heading">Danger Zone</IonListHeader>
-        <IonItem>
+        <IonItem lines="none">
           <IonButton color="danger" style={{width: 120, height: 30}}>Reset All&nbsp;
             <IonIcon icon={trash}></IonIcon>
           </IonButton>

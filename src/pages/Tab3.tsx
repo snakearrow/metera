@@ -3,7 +3,8 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList
   IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardHeader, IonCardContent, IonCardTitle, IonCardSubtitle, IonRow, IonGrid, IonCol } from '@ionic/react';
 import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
-import { loadSettings, updateSettings, defaultSettings } from '../util';
+import { Stats } from '../interfaces/stats';
+import { loadSettings, updateSettings, defaultSettings, loadStatistics } from '../util';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
 import './Tab3.css';
@@ -11,6 +12,7 @@ import './Tab3.css';
 const Tab3: React.FC = () => {
 
   const [settings, setSettings] = useState(null as Settings | null);
+  const [statistics, setStatistics] = useState(null as Stats | null);
   
   const budgetGood = "#32a840";
   const budgetOkay = "#ffa600";
@@ -61,10 +63,20 @@ const Tab3: React.FC = () => {
        </IonCard>
      );
   }
+  
+  const getStatistics = (): void => {
+    loadStatistics().then((result) => {
+        if (result) {
+          setStatistics(result);
+        } else {
+          console.log("could not load statistics");
+        }
+    })
+  };
 
   
   useEffect(() => {
-
+    getStatistics();
   }, [])
 
   return (
@@ -75,13 +87,17 @@ const Tab3: React.FC = () => {
             <IonTitle size="large">Report</IonTitle>
           </IonToolbar>
         </IonHeader>
-        
+        {statistics && (
         <IonCard>
           <IonCardHeader>
             <IonCardTitle class="card-heading">Statistics</IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
             <IonGrid>
+              <IonRow>
+                <IonCol>Total Mileage:</IonCol>
+                <IonCol>{statistics.mileage}km</IonCol>
+              </IonRow>
               <IonRow>
                 <IonCol size="6">Kilometers Left:</IonCol>
                 <IonCol>39012km</IonCol>
@@ -93,6 +109,8 @@ const Tab3: React.FC = () => {
             </IonGrid>
           </IonCardContent>
         </IonCard>
+        
+        )}
         
         {buildMonthCard("December", 800, 632.0)}
         {buildMonthCard("November", 800, 790.0)}
