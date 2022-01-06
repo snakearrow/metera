@@ -1,6 +1,8 @@
 import { Storage } from '@capacitor/storage';
 import { Settings } from './interfaces/settings';
 import { Trip } from './interfaces/trip';
+import { Stats, MonthStats } from './interfaces/stats';
+import { getNumberOfDaysInCurrentMonth } from './dateutils';
 import { cart, briefcase, barbell, people, home, add, trash, car } from 'ionicons/icons';
 
 export function getIconForKeyword(_keyword: string) {
@@ -56,7 +58,7 @@ export function buildSettings(budgetPerYear: number, totalYears: number): Settin
     let settings: Settings = {
         budgetPerYear: budgetPerYear,
         totalBudget: totalBudget,
-        totalYears: totalYears
+        totalYears: totalYears,
     };
     return settings;
 };
@@ -79,11 +81,12 @@ export const loadTemplateTrips = async (): Promise<Trip[] | null> => {
         : null;
 };
 
-export const saveTemplateTrip = async (name: string, description: any, kilometers: number): Promise<Trip | null> => {
-  loadTemplateTrips().then((result) => {
+export const saveTemplateTrip = async (name: string, description: any, kilometers: number): Promise<Trip[] | null> => {
+  let newTrips = null;
+  await loadTemplateTrips().then((result) => {
     if (result) {
       // append to existing trips
-      let newTrips = [
+      newTrips = [
         {
           kilometers: kilometers,
           name: name,
@@ -95,6 +98,7 @@ export const saveTemplateTrip = async (name: string, description: any, kilometer
           key: 'templateTrips',
           value: JSON.stringify(newTrips)
       });
+      return newTrips;
     } else {
       // first trip to save
       const trip = [buildTrip(name, description, kilometers)];
@@ -102,19 +106,21 @@ export const saveTemplateTrip = async (name: string, description: any, kilometer
             key: 'templateTrips',
             value: JSON.stringify(trip)
         });
+      newTrips = trip;
     }
   });
   
-  return buildTrip(name, description, kilometers);
+  return newTrips;
 }
 
 export const deleteTemplateTripByName = async(name: string): Promise<Trip[] | null> => {
+  let newTrips = null;
   await loadTemplateTrips().then((result) => {
     if (result) {
       for (let i = 0; i < result.length; i++) {
         const trip = result[i];
         if (trip.name === name) {
-          let newTrips = result;
+          newTrips = result;
           newTrips.splice(i, 1);
           Storage.set({
             key: 'templateTrips',
@@ -126,6 +132,26 @@ export const deleteTemplateTripByName = async(name: string): Promise<Trip[] | nu
       }
     }
   });
-  return null;
+  return newTrips;
+}
+
+export const initStatistics = async(mileage: number): Promise<Stats | null> => {
+  const now = new Date();
+  let monthStats: MonthStats = {
+    year: now.getFullYear(),
+    month: now.getMonth(),
+    kilometers: Array(getNumberOfDaysInCurrentMonth()).fill(0)
+  };
+  
+  let statistics: Stats = {
+    mileage: mileage,
+    monthStats: [monthStats]
+  }
+  
+  await Storage.set({
+    key: 'statistics',
+    value: JSON.stringify(statistics)
+  });
+  return statistics;
 }
 

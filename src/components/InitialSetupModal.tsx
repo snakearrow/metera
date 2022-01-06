@@ -10,7 +10,8 @@ type InitialSetupModalProps = {
 
 type InitialSetupModalState = {
   kmPerYear: number,
-  totalYears: number;
+  totalYears: number,
+  mileage: number;
 }
 
 class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialSetupModalState> {
@@ -19,8 +20,30 @@ class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialS
     super(props)
     this.state ={
       kmPerYear: 10000,
-      totalYears: 4
+      totalYears: 4,
+      mileage: 0
     }
+  }
+  
+  handleKmChange(_km: any) {
+    const km = parseInt(_km.detail.value);
+    this.setState({
+      kmPerYear: km
+    });
+  }
+  
+  handleYearsChange(_years: any) {
+    const years = parseInt(_years.detail.value);
+    this.setState({
+      totalYears: years
+    });
+  }
+  
+  handleMileageChange(_km: any) {
+    const mileage = parseInt(_km.detail.value);
+    this.setState({
+      mileage: mileage
+    });
   }
 
   render() {
@@ -45,15 +68,20 @@ class InitialSetupModal extends React.Component<InitialSetupModalProps, InitialS
           <IonList>
             <IonItem lines="none">
               <IonLabel position="stacked">Kilometer Budger p.a.:</IonLabel>
-              <IonInput value={this.state.kmPerYear} placeholder="10000" type="number"></IonInput>
+              <IonInput value={this.state.kmPerYear} placeholder="10000" type="number" onIonChange={(e) => this.handleKmChange(e)}></IonInput>
             </IonItem>
             <IonItem lines="none">
               <IonLabel position="stacked">Years:</IonLabel>
-              <IonInput value={this.state.totalYears} placeholder="4" type="number"></IonInput>
+              <IonInput value={this.state.totalYears} placeholder="4" type="number" onIonChange={(e) => this.handleYearsChange(e)}></IonInput>
+            </IonItem>
+            <IonItem lines="none">
+              <IonLabel position="stacked">Current Mileage:</IonLabel>
+              <IonInput value={this.state.mileage} placeholder="0" type="number" onIonChange={(e) => this.handleMileageChange(e)}></IonInput>
             </IonItem>
           </IonList>
           <div style={{padding:10, textAlign:'center'}}>
-              <IonButton color="success" style={{height:40, width: 120}} onClick={() => this.props.closeAction([this.state.kmPerYear, this.state.totalYears])}>Start</IonButton>
+              <IonButton color="success" style={{height:40, width: 120}} 
+                onClick={() => this.props.closeAction([this.state.kmPerYear, this.state.totalYears, this.state.mileage])}>Start</IonButton>
           </div>
         </IonContent>
     </>

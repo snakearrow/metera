@@ -6,7 +6,7 @@ import { add } from 'ionicons/icons';
 import AddTripModal from '../components/AddTripModal';
 import InitialSetupModal from '../components/InitialSetupModal';
 import { Settings } from '../interfaces/settings';
-import { loadSettings,  updateSettings } from '../util';
+import { loadSettings,  updateSettings, initStatistics } from '../util';
 import { getNumberOfDaysInCurrentMonth, getDaysInMonth } from '../dateutils';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
@@ -58,7 +58,10 @@ const Tab1: React.FC = () => {
       // we got some initial data to save
       let budgetPerYear = parseFloat(args[0]);
       let totalYears = parseInt(args[1]);
+      let mileage = parseInt(args[2]);
+      console.log("milage: " + mileage);
       updateSettings(budgetPerYear, totalYears);
+      initStatistics(mileage);
     }
     setFirstTimeUsingApp(false);
   }

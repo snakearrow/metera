@@ -20,7 +20,14 @@ const Tab2: React.FC = () => {
       let name = args[0];
       let description = (args[1] === undefined ? "" : args[1]);
       let km = args[2];
-      saveTemplateTrip(name, description, km);
+      saveTemplateTrip(name, description, km).then((result) => {
+        if (result) {
+          console.log("ok"); 
+          setTemplateTrips(result);
+        } else {
+          console.log("null");
+        }
+      });
     }
     await setShowAddTemplateTripModal(false);
   }
@@ -76,17 +83,11 @@ const Tab2: React.FC = () => {
     deleteTemplateTripByName(name).then(result => {
       if (result) {
         setTemplateTrips(result);
-        console.log("set template trips after delete");
-      } else {
-      // FIXME
-        console.log("template trips is null"); 
       }
     });
   }
   
   function buildTemplateTripsList() {
-    console.log(templateTrips);
-    
     if (templateTrips === null || templateTrips!.length <= 0) {
       return (
         <IonItem>
