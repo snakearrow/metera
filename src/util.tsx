@@ -203,6 +203,23 @@ export const saveMileageTrip = async(kmTrip: number): Promise<Stats | null> => {
   return newStats;
 }
 
+export const addTripFromTemplate = async(name: string): Promise<Stats | null> => {
+  let newStats = null;
+  await loadTemplateTrips().then(result => {
+    if (result) {
+      const trips = result;
+      for (let i = 0; i < trips.length; i++) {
+        if (name === trips[i].name) {
+          const km = trips[i].kilometers;
+          newStats = saveCustomTrip(null, null, km);
+          return newStats;
+        }
+      }
+    }
+  });
+  return newStats;
+}
+
 export function getStatsForDay(stats: Stats, settings: Settings, day: number, month: number, year: number) {
   for (let i = 0; i < stats.monthStats.length; i++) {
     const monthStat = stats.monthStats[i];

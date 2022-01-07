@@ -7,7 +7,7 @@ import AddTripModal from '../components/AddTripModal';
 import InitialSetupModal from '../components/InitialSetupModal';
 import { Settings } from '../interfaces/settings';
 import { Stats } from '../interfaces/stats';
-import { loadSettings,  updateSettings, initStatistics, saveCustomTrip, loadStatistics, getBudgetLeftToday, getBudgetLeftMonth, saveMileageTrip,
+import { loadSettings,  updateSettings, initStatistics, saveCustomTrip, loadStatistics, getBudgetLeftToday, getBudgetLeftMonth, saveMileageTrip, addTripFromTemplate,
  getBudgetLeftTotal, getBudgetLeftYear, getStatsForDay } from '../util';
 import { getNumberOfDaysInCurrentMonth, getDaysInMonth } from '../dateutils';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
@@ -61,8 +61,6 @@ const Tab1: React.FC = () => {
   async function closeAddTripModal(args: any) {
     if (args !== undefined) {
       const type = args[0];
-      console.log("adding new trip with type: " + type);
-      console.log("args = " + args);
       
       if (type === "custom") {
         const name = args[1];
@@ -70,6 +68,16 @@ const Tab1: React.FC = () => {
         // TODO: what to do with name + description ?
         const kilometers = parseInt(args[3]);
         await saveCustomTrip(name, description, kilometers).then(result => {
+          if (result) {
+            setStats(result);
+            update(result);
+          }
+        });
+      }
+      
+      else if (type === "template") {
+        const name = args[1];
+        await addTripFromTemplate(name).then(result => {
           if (result) {
             setStats(result);
             update(result);
@@ -99,8 +107,18 @@ const Tab1: React.FC = () => {
       let budgetPerYear = parseFloat(args[0]);
       let totalYears = parseInt(args[1]);
       let mileage = parseInt(args[2]);
-      updateSettings(budgetPerYear, totalYears);
-      initStatistics(mileage);
+      await updateSettings(budgetPerYear, totalYears).then(result => {
+        if (result) {
+          setSettings(result);
+          updateBudgets(result);
+        }
+      });
+      await initStatistics(mileage).then(result => {
+        if (result) {
+          setStats(result);
+          update(result);
+        }
+      });
     }
     setFirstTimeUsingApp(false);
   }
@@ -204,15 +222,19 @@ const Tab1: React.FC = () => {
      );
   }
   
+  const updateBudgets = (settings: Settings): void => {
+    setBudgetMonth(settings.budgetPerYear / 12.0);
+    setBudgetDay(settings.budgetPerYear / 12.0 / getNumberOfDaysInCurrentMonth());
+    setBudgetTotal(settings.totalBudget);
+    setBudgetYear(settings.budgetPerYear);
+  }
+  
   const getSettings = (): void => {
     loadSettings().then((result) => {
       if (result) {
         console.log("settings found");
         setSettings(result);
-        setBudgetMonth(result.budgetPerYear / 12.0);
-        setBudgetDay(result.budgetPerYear / 12.0 / getNumberOfDaysInCurrentMonth());
-        setBudgetTotal(result.totalBudget);
-        setBudgetYear(result.budgetPerYear);
+        updateBudgets(result);
       } else {
         console.log("no settings found");
         setFirstTimeUsingApp(true);
@@ -225,6 +247,8 @@ const Tab1: React.FC = () => {
       if (result) {
         setStats(result);
         update(result);
+      } else {
+        console.log("no statistics found");
       }
     })
   };
