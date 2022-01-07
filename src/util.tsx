@@ -203,6 +203,16 @@ export const saveMileageTrip = async(kmTrip: number): Promise<Stats | null> => {
   return newStats;
 }
 
+export function getStatsForDay(stats: Stats, settings: Settings, day: number, month: number, year: number) {
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    if (monthStat.year === year && monthStat.month === month) {
+      return monthStat.kilometers[day];
+    }
+  }
+  return null;
+}
+
 export function getBudgetLeftToday(stats: Stats, settings: Settings): number {
   const now = new Date();
   const year = now.getFullYear();
@@ -232,7 +242,7 @@ export function getBudgetLeftMonth(stats: Stats, settings: Settings): number {
   for (let i = 0; i < stats.monthStats.length; i++) {
     const monthStat = stats.monthStats[i];
     if (monthStat.year === year && monthStat.month === month) {
-      return monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
+      return budgetPerMonth - monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
       break;
     }
   }

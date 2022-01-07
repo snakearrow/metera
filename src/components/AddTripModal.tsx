@@ -114,25 +114,22 @@ class AddTripModal extends React.Component<AddTripModalProps, AddTripModalState>
     if (selectedSegment === "custom") {
       return (
         <IonList>
-          <IonItem>
+          <IonItem lines="none">
             <IonLabel position="fixed">Name:</IonLabel>
             <IonInput onIonChange={e => this.handleNameChange(e.detail.value)}></IonInput>
           </IonItem>
-          <IonItem>
+          <IonItem lines="none">
             <IonLabel position="fixed">Description:</IonLabel>
             <IonInput onIonChange={e => this.handleDescChange(e.detail.value)}></IonInput>
           </IonItem>
-          <IonItem>
+          <IonItem lines="none">
             <IonLabel position="fixed">Kilometers:</IonLabel>
             <IonInput type="number" onIonChange={e => this.handleKilometersChange(e)}></IonInput>
           </IonItem>
-          <IonItem>
-          <IonButton color="secondary" onClick={() => this.props.closeAction()}>
-                Cancel
-            </IonButton>
-            <IonButton color="success" onClick={() => this.addCustom()}>
-                Add
-                <IonIcon icon={add} />
+          <IonItem lines="none">
+            <IonButton color="success" onClick={() => this.addCustom()} style={{width:100, height:30}}>
+              Add&nbsp;
+              <IonIcon icon={add} />
             </IonButton>
           </IonItem>
        </IonList>
@@ -183,7 +180,7 @@ class AddTripModal extends React.Component<AddTripModalProps, AddTripModalState>
           <IonLabel>km</IonLabel>
         </IonItem>
         <IonItem lines="none">
-          <IonButton color="success" onClick={() => this.addMileage()}>Add
+          <IonButton color="success" onClick={() => this.addMileage()} style={{width:100, height:30}}>Add&nbsp;
             <IonIcon slot="end" icon={add}></IonIcon>
           </IonButton>
         </IonItem>

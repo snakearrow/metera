@@ -8,7 +8,7 @@ import InitialSetupModal from '../components/InitialSetupModal';
 import { Settings } from '../interfaces/settings';
 import { Stats } from '../interfaces/stats';
 import { loadSettings,  updateSettings, initStatistics, saveCustomTrip, loadStatistics, getBudgetLeftToday, getBudgetLeftMonth, saveMileageTrip,
- getBudgetLeftTotal, getBudgetLeftYear } from '../util';
+ getBudgetLeftTotal, getBudgetLeftYear, getStatsForDay } from '../util';
 import { getNumberOfDaysInCurrentMonth, getDaysInMonth } from '../dateutils';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
@@ -34,6 +34,7 @@ const Tab1: React.FC = () => {
   const [usePercent, setUsePercent] = useState<boolean>(true);
   const [firstTimeUsingApp, setFirstTimeUsingApp] = useState<boolean>(false); 
   
+  const [selectedDay, setSelectedDay] = useState<number>();
 
   const update = async(statistics: Stats) => {
     const now = new Date();
@@ -108,18 +109,57 @@ const Tab1: React.FC = () => {
     setUsePercent(!usePercent);
   }
   
+  async function calendarItemClicked(item: any) {
+    setSelectedDay(+item.target.textContent);
+  }
+  
   function createDayItem(day: number, today: number) {
     let is_today = day === today;
     
     if (is_today) {
       return (
-        <IonCol><IonButton class="calendar-day-today">{day}</IonButton></IonCol>
+        <IonCol><IonButton class="calendar-day-today" onClick={e => calendarItemClicked(e)}>{day}</IonButton></IonCol>
       );
     }
     
     return (
-      <IonCol><IonButton class="calendar-day">{day}</IonButton></IonCol>
+      <IonCol><IonButton class="calendar-day" onClick={e => calendarItemClicked(e)}>{day}</IonButton></IonCol>
     );
+  }
+  
+  
+  function buildDayOverview() {
+    let now = new Date();
+    let today = now.getDate();
+    if (selectedDay === today) {
+      return (<IonList></IonList>);
+    }
+    
+    const formatter = new Intl.DateTimeFormat('en', { month: 'long' });
+    const month = formatter.format(now);
+    
+    if (stats && settings && selectedDay && budgetDay) {
+      const kmDriven = getStatsForDay(stats, settings, selectedDay, now.getMonth(), now.getFullYear());
+      if (kmDriven !== null) {
+        const diff = budgetDay - kmDriven;
+        const sign = (diff >= 0 ? '+' : '-');
+        
+        return (
+          <IonList>
+            <IonItem lines="none">
+              <IonLabel>{month} {selectedDay}</IonLabel>
+              <IonLabel>Total: {kmDriven}km</IonLabel>
+            </IonItem>
+            <IonItem lines="none" class="item-small">
+              <IonLabel></IonLabel>
+              <IonLabel>Diff: {sign}{diff.toFixed(1)}km</IonLabel>
+            </IonItem>
+          </IonList>
+        );
+      }
+    }
+    
+    return (<IonLabel>ERR</IonLabel>);
   }
   
   function buildCalendarGrid() {
@@ -188,8 +228,26 @@ const Tab1: React.FC = () => {
       }
     })
   };
+  
+  const init = (): void => {
+    let now = new Date();
+    let today = now.getDate();
+    setSelectedDay(today);
+  };
+  
+  const progressBarColor = (percent: number): string => {
+    percent = percent*100.0;
+    if (percent >= 50.0) {
+      return "success";
+    }
+    else if (percent >= 10.0) {
+      return "warning";
+    }
+    return "danger";
+  }
 
   useEffect(() => {
+    init();
     getSettings();
     getStatistics();
   }, [])
@@ -216,8 +274,8 @@ const Tab1: React.FC = () => {
         <IonList>
           {stats && leftDay && budgetDay && (
           <IonItem lines="none">
-            <IonText>Left today: {leftDay.toFixed(2)}km</IonText>
-            <IonProgressBar color="secondary" value={1.0/budgetDay*leftDay}></IonProgressBar>
+            <IonText>Left today: {leftDay.toFixed(1)}km</IonText>
+            <IonProgressBar color={progressBarColor(1.0/budgetDay*leftDay)} value={1.0/budgetDay*leftDay}></IonProgressBar>
           </IonItem>
           )}
           
@@ -260,6 +318,7 @@ const Tab1: React.FC = () => {
         </IonModal>
         
         {buildCalendarGrid()}
+        {buildDayOverview()}
         
         <IonModal isOpen={showAddTripModal}>
             <AddTripModal closeAction={closeAddTripModal}></AddTripModal>
