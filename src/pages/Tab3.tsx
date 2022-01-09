@@ -156,7 +156,7 @@ const Tab3: React.FC = () => {
               </IonRow>
               <IonRow>
                 <IonCol>Average km / month:</IonCol>
-                <IonCol>{getAverageMonthlyKm(statistics)}km</IonCol>
+                <IonCol>{getAverageMonthlyKm(statistics).toFixed(1)}km</IonCol>
               </IonRow>
             </IonGrid>
           </IonCardContent>
