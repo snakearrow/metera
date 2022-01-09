@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonLabel, IonToolbar, IonList, IonListHeader, 
-  IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardHeader, IonCardContent, IonCardTitle, IonCardSubtitle, IonRow, IonGrid, IonCol } from '@ionic/react';
+  IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardHeader, IonCardContent, IonCardTitle, IonCardSubtitle, IonRow, IonGrid, IonCol, withIonLifeCycle, useIonViewDidEnter } from '@ionic/react';
 import { Settings } from '../interfaces/settings';
 import { Trip } from '../interfaces/trip';
 import { Stats } from '../interfaces/stats';
-import { loadSettings, updateSettings, defaultSettings, loadStatistics } from '../util';
+import { loadSettings, loadStatistics, getAverageMonthlyKm, getBudgetLeftTotal, getMonthStatsFor } from '../util';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
 import 'react-circular-progressbar/dist/styles.css';
 import './Tab3.css';
@@ -13,26 +13,44 @@ const Tab3: React.FC = () => {
 
   const [settings, setSettings] = useState(null as Settings | null);
   const [statistics, setStatistics] = useState(null as Stats | null);
+  const [budgetMonth, setBudgetMonth] = useState<number>();
   
   const budgetGood = "#32a840";
   const budgetOkay = "#ffa600";
   const budgetBad = "#c20000";
   
-  function buildMonthCard(month: string, kmBudgetMonth: number, kmDriven: number) {
+  useIonViewDidEnter(() => {
+    getStatistics();
+  });
+  
+  function buildMonthCard(year: number, month: number) {
+    if (budgetMonth === null || budgetMonth === undefined || statistics === null || settings === null) {
+      return;
+    }
+    
+    const kmDriven = getMonthStatsFor(statistics, settings, year, month);
+    if (kmDriven === null) {
+      return (<IonCard></IonCard>);
+    }
+    
     let color = budgetGood;
-    let diff = kmBudgetMonth - kmDriven;
+    let diff = budgetMonth - kmDriven;
     if (diff < 0) {
       color = budgetBad;
     } else if (diff < 50.0) {
       color = budgetOkay;
     }
-    let percent = parseFloat(Math.min(100.0, 100.0/kmBudgetMonth*kmDriven).toPrecision(3));
+    let percent = parseFloat(Math.min(100.0, 100.0/budgetMonth*kmDriven).toPrecision(3));
     let sign = (diff >= 0 ? '+' : '-');
+    const formatter = new Intl.DateTimeFormat('en', { month: 'long' });
+    let now = new Date();
+    now.setMonth(month);
+    const monthStr = formatter.format(now);
     
     return (
        <IonCard style={{}}>
          <IonCardHeader>
-           <IonCardTitle class="card-heading">{month}</IonCardTitle>
+           <IonCardTitle class="card-heading">{monthStr} {year}</IonCardTitle>
          </IonCardHeader>
          <IonCardContent>
            <IonGrid>
@@ -40,13 +58,13 @@ const Tab3: React.FC = () => {
                <IonCol>
                  <IonGrid>
                    <IonRow>
-                     <IonCol>Kilometer Driven:</IonCol>
+                     <IonCol>Km Driven:</IonCol>
                    </IonRow>
                    <IonRow>
-                     <IonCol>{kmDriven}km / {kmBudgetMonth}km</IonCol>
+                     <IonCol>{kmDriven}km / {budgetMonth.toPrecision(5)}km</IonCol>
                    </IonRow>
                    <IonRow>
-                     <IonCol>Difference: {sign}{Math.abs(diff)}km</IonCol>
+                     <IonCol>Difference: {sign}{Math.abs(diff).toPrecision(4)}km</IonCol>
                    </IonRow>
                  </IonGrid>
                </IonCol>
@@ -64,19 +82,53 @@ const Tab3: React.FC = () => {
      );
   }
   
+  function buildMonthCards() {
+    let now = new Date();
+    let month = now.getMonth();
+    let year = now.getFullYear();
+    if (month <= 5) {
+      year--;
+      month = 5 + month;
+    } else {
+      month = month - 6;
+    }
+    
+    let cards = [];
+    let count = 0;
+    while (count <= 6) {
+      cards.push(buildMonthCard(year, month));
+      count++;
+      console.log("rendering " + (month+1) + "," + year);
+      month++;
+      if (month > 11) {
+        month = 0;
+        year++;
+      }
+    }
+    return cards.reverse();
+  }
+  
   const getStatistics = (): void => {
-    loadStatistics().then((result) => {
+    loadStatistics().then(result => {
         if (result) {
           setStatistics(result);
-        } else {
-          console.log("could not load statistics");
         }
     })
   };
+  
+  const getSettings = (): void => {
+    loadSettings().then(result => {
+      if (result) {
+        setSettings(result);
+        setBudgetMonth(result.budgetPerYear/12.0);
+      }
+    });
+  }
 
   
   useEffect(() => {
     getStatistics();
+    getSettings();
   }, [])
 
   return (
@@ -87,7 +139,7 @@ const Tab3: React.FC = () => {
             <IonTitle size="large">Report</IonTitle>
           </IonToolbar>
         </IonHeader>
-        {statistics && (
+        {statistics && settings && (
         <IonCard>
           <IonCardHeader>
             <IonCardTitle class="card-heading">Statistics</IonCardTitle>
@@ -100,11 +152,11 @@ const Tab3: React.FC = () => {
               </IonRow>
               <IonRow>
                 <IonCol size="6">Kilometers Left:</IonCol>
-                <IonCol>39012km</IonCol>
+                <IonCol>{getBudgetLeftTotal(statistics, settings)}km</IonCol>
               </IonRow>
               <IonRow>
                 <IonCol>Average km / month:</IonCol>
-                <IonCol>724.1km</IonCol>
+                <IonCol>{getAverageMonthlyKm(statistics)}km</IonCol>
               </IonRow>
             </IonGrid>
           </IonCardContent>
@@ -112,13 +164,11 @@ const Tab3: React.FC = () => {
         
         )}
         
-        {buildMonthCard("December", 800, 632.0)}
-        {buildMonthCard("November", 800, 790.0)}
-        {buildMonthCard("October", 800, 890.0)}
+        {buildMonthCards()}
         
      </IonContent>
     </IonPage>
   );
 };
 
-export default Tab3;
+export default withIonLifeCycle(Tab3);

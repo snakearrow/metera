@@ -218,7 +218,7 @@ const Tab1: React.FC = () => {
      
      const value = parseFloat(val.toPrecision(precision));
      return (
-       <CircularProgressbar value={val} text={`${val}km`} maxValue={maxValue} styles={buildStyles({textSize: '14px'})} />
+       <CircularProgressbar value={value} text={`${value}km`} maxValue={maxValue} styles={buildStyles({textSize: '14px'})} />
      );
   }
   

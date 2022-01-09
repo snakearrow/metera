@@ -289,3 +289,27 @@ export function getBudgetLeftTotal(stats: Stats, settings: Settings): number {
   }
   return settings.totalBudget - sum;
 }
+
+export function getAverageMonthlyKm(stats: Stats): number {
+  let monthlySums = [];
+  let count = 0;
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    const sum = monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
+    monthlySums.push(sum);
+    count++;
+  }
+  let sum = monthlySums.reduce((pv, cv) => pv + cv, 0);
+  return sum / count;
+}
+
+export function getMonthStatsFor(stats: Stats, settings: Settings, year: number, month: number) {
+  for (let i = 0; i < stats.monthStats.length; i++) {
+    const monthStat = stats.monthStats[i];
+    if (monthStat.year === year && monthStat.month === month) {
+      return monthStat.kilometers.reduce((pv, cv) => pv + cv, 0);
+    }
+  }
+  return null;
+}
+
