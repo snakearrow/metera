@@ -174,7 +174,7 @@ export const saveCustomTrip = async(name: any, description: any, kilometers: num
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
-  const day = now.getDate();
+  const day = now.getDate()-1;
   let newStats = null;
   
   console.log("save trip with kilometers: " + kilometers);
@@ -234,7 +234,7 @@ export function getBudgetLeftToday(stats: Stats, settings: Settings): number {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
-  const day = now.getDate();
+  const day = now.getDate()-1;
   
   const budgetPerMonth = settings.budgetPerYear / 12.0;
   const budgetPerDay = budgetPerMonth / getNumberOfDaysInCurrentMonth();

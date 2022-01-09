@@ -157,10 +157,16 @@ const Tab1: React.FC = () => {
     const month = formatter.format(now);
     
     if (stats && settings && selectedDay && budgetDay) {
-      const kmDriven = getStatsForDay(stats, settings, selectedDay, now.getMonth(), now.getFullYear());
+      const kmDriven = getStatsForDay(stats, settings, selectedDay-1, now.getMonth(), now.getFullYear());
       if (kmDriven !== null) {
         const diff = budgetDay - kmDriven;
         const sign = (diff >= 0 ? '+' : '-');
+        let color = "success";
+        if (diff === 0) {
+          color = "warning";
+        } else if (diff < 0) {
+          color = "danger";
+        }
         
         return (
           <IonList>
@@ -170,7 +176,7 @@ const Tab1: React.FC = () => {
             </IonItem>
             <IonItem lines="none" class="item-small">
               <IonLabel></IonLabel>
-              <IonLabel>Diff: {sign}{diff.toFixed(1)}km</IonLabel>
+              <IonLabel color={color}>Diff: {sign}{Math.abs(diff).toFixed(1)}km</IonLabel>
             </IonItem>
           </IonList>
         );
@@ -210,13 +216,13 @@ const Tab1: React.FC = () => {
   
   function buildProgressCircle(val: number, maxValue: any, precision: number) {
      if (usePercent) {
-       const percent = parseFloat((100.0 / maxValue! * val).toPrecision(precision));
+       const percent = parseFloat((100.0 / maxValue! * val).toFixed(precision));
        return (
          <CircularProgressbar value={percent} text={`${percent}%`} styles={buildStyles({textSize: '14px'})} />
        );
      }
      
-     const value = parseFloat(val.toPrecision(precision));
+     const value = parseFloat(val.toFixed(precision));
      return (
        <CircularProgressbar value={value} text={`${value}km`} maxValue={maxValue} styles={buildStyles({textSize: '14px'})} />
      );
@@ -306,7 +312,7 @@ const Tab1: React.FC = () => {
           <IonItem lines="none">
             <IonGrid>
               <IonRow>
-                <IonCol>Month</IonCol>
+                <IonCol size="4.7">Month</IonCol>
                 <IonCol>Year</IonCol>
                 <IonCol>Total</IonCol>
               </IonRow>
@@ -314,21 +320,21 @@ const Tab1: React.FC = () => {
                 <IonCol>
                   {stats && leftMonth && budgetMonth && (
                   <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>
-                      {buildProgressCircle(leftMonth!, budgetMonth, 3)}
+                      {buildProgressCircle(leftMonth!, budgetMonth, 2)}
                    </div>
                    )}
                  </IonCol>
                  <IonCol>
                    {stats && leftYear && budgetYear && (
                    <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>
-                      {buildProgressCircle(leftYear!, budgetYear, 3)}
+                      {buildProgressCircle(leftYear!, budgetYear, 1)}
                    </div>
                    )}
                  </IonCol>
                  <IonCol>
                    {stats && leftTotal && budgetTotal && (
                    <div style={{ width: 80, height: 80 }} onClick={() => togglePercent()}>
-                      {buildProgressCircle(leftTotal!, budgetTotal, 2)}
+                      {buildProgressCircle(leftTotal!, budgetTotal, 1)}
                    </div>
                    )}
                  </IonCol>
