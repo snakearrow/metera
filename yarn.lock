@@ -2,6 +2,27 @@
 # yarn lockfile v1
 
 
+"@awesome-cordova-plugins/core@^5.1.0":
+  "integrity" "sha512-jNjFryW1+iG0CFn+zI5wy6YErViPq1TnwxnC+p/3MK7goRMTz+KmgVifOVhQCJkh0nfkK54pXoNiKin5xKDEZg=="
+  "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/core/-/core-5.39.0.tgz"
+  "version" "5.39.0"
+  dependencies:
+    "@types/cordova" "latest"
+
+"@awesome-cordova-plugins/geolocation@^5.39.0":
+  "integrity" "sha512-ydF58Wq6duqWSG2NyyOcQOx2ite3wTsXxoPmGDRQ2KhxDed9pSgPBaqVKjEw6n/z7QVjgpph+q04gshXAdjGjA=="
+  "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/geolocation/-/geolocation-5.39.0.tgz"
+  "version" "5.39.0"
+  dependencies:
+    "@types/cordova" "latest"
+
+"@awesome-cordova-plugins/insomnia@^5.39.0":
+  "integrity" "sha512-5jmc3G+x8OyC2WCMblaxkxquaHWfC1fabJiHcpbU8Pu14nKalnBoXPGb3Sbha/qsl8NpOO6SxkaXT+36r1YuPg=="
+  "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/insomnia/-/insomnia-5.39.0.tgz"
+  "version" "5.39.0"
+  dependencies:
+    "@types/cordova" "latest"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.16.0", "@babel/code-frame@^7.5.5":
   "integrity" "sha512-IF4EOMEV+bfYwOmNxGzSnjR2EmQod7f1UXOpZM3l4i4o4QNwzjtJAu/HxdjHq0aYBvdqMuQEY1eg0nqW9ZPORA=="
   "resolved" "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.16.0.tgz"
@@ -1220,6 +1241,20 @@
   "resolved" "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   "version" "1.2.1"
 
+"@ionic-native/core@^5.1.0":
+  "integrity" "sha512-lOrkktadlKYbYf1LrDyAtsu1JnQ0oCCdkOU7iHQ8oXnNOkMwobFfD2m62F1CoOr0u9LIkpYnZSPjng8lZbmbNw=="
+  "resolved" "https://registry.npmjs.org/@ionic-native/core/-/core-5.36.0.tgz"
+  "version" "5.36.0"
+  dependencies:
+    "@types/cordova" "latest"
+
+"@ionic-native/geolocation@^5.36.0":
+  "integrity" "sha512-Fk7YXBn9/dOBGqtySSQgoCg7OLlmS8M6Y1Xa3hjgZBzFU0NPb9nnhVuMWI5Wp2qH/7cuzWRB7kEp4oN2tZ6fbw=="
+  "resolved" "https://registry.npmjs.org/@ionic-native/geolocation/-/geolocation-5.36.0.tgz"
+  "version" "5.36.0"
+  dependencies:
+    "@types/cordova" "latest"
+
 "@ionic/cli-framework-output@^2.2.1":
   "integrity" "sha512-eQYkqIW1/tCwSC6Bd0gjse96U11lDX/ikf3jvsjX7a8z/zwSmGzCHRizb7xogV65Ey+1/zyAZR71cpDRQuFLBQ=="
   "resolved" "https://registry.npmjs.org/@ionic/cli-framework-output/-/cli-framework-output-2.2.2.tgz"
@@ -1838,6 +1873,11 @@
   "version" "7.14.2"
   dependencies:
     "@babel/types" "^7.3.0"
+
+"@types/cordova@latest":
+  "integrity" "sha1-6nrd907Ow9dimCegw54smt3HPQQ="
+  "resolved" "https://registry.npmjs.org/@types/cordova/-/cordova-0.0.34.tgz"
+  "version" "0.0.34"
 
 "@types/eslint@^7.28.2":
   "integrity" "sha512-VNcvioYDH8/FxaeTKkM4/TiTwt6pBV9E3OfGmvaw8tPl0rrHCJ4Ll15HRT+pMiFAf/MLQvAzC+6RzUMEL9Ceng=="
@@ -3764,6 +3804,16 @@
   "integrity" "sha1-Z29us8OZl8LuGsOpJP1hJHSPV40="
   "resolved" "https://registry.npmjs.org/copy-descriptor/-/copy-descriptor-0.1.1.tgz"
   "version" "0.1.1"
+
+"cordova-plugin-geolocation@^4.1.0":
+  "integrity" "sha512-y5io/P10xGMxSn2KEqfv/fExK47eA1pmSonJdmDqDsaSADV9JpgdPx0mUSA08+5pzma/OS9R0LoODeDPx7Jvjg=="
+  "resolved" "https://registry.npmjs.org/cordova-plugin-geolocation/-/cordova-plugin-geolocation-4.1.0.tgz"
+  "version" "4.1.0"
+
+"cordova-plugin-insomnia@^4.3.0":
+  "integrity" "sha1-gyoz9tdj8LgCc733YbNbZ4xDuVc="
+  "resolved" "https://registry.npmjs.org/cordova-plugin-insomnia/-/cordova-plugin-insomnia-4.3.0.tgz"
+  "version" "4.3.0"
 
 "core-js-compat@^3.18.0", "core-js-compat@^3.19.1":
   "integrity" "sha512-AVhKZNpqMV3Jz8hU0YEXXE06qoxtQGsAqU0u1neUngz5IusDJRX/ZJ6t3i7mS7QxNyEONbCo14GprkBrxPlTZA=="
@@ -10106,6 +10156,13 @@
   dependencies:
     "aproba" "^1.1.1"
 
+"rxjs@^5.5.0 || ^6.5.0", "rxjs@^5.5.0 || ^6.5.0 || ^7.3.0":
+  "integrity" "sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ=="
+  "resolved" "https://registry.npmjs.org/rxjs/-/rxjs-6.6.7.tgz"
+  "version" "6.6.7"
+  dependencies:
+    "tslib" "^1.9.0"
+
 "safe-buffer@^5.0.1", "safe-buffer@^5.1.0", "safe-buffer@^5.1.1", "safe-buffer@^5.1.2", "safe-buffer@~5.1.0", "safe-buffer@~5.1.1", "safe-buffer@5.1.2":
   "integrity" "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g=="
   "resolved" "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
@@ -11285,6 +11342,11 @@
   "version" "2.3.1"
 
 "tslib@^1.8.1":
+  "integrity" "sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg=="
+  "resolved" "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
+  "version" "1.14.1"
+
+"tslib@^1.9.0":
   "integrity" "sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg=="
   "resolved" "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   "version" "1.14.1"
