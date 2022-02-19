@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Storage } from '@capacitor/storage';
+import {registerPlugin} from "@capacitor/core";
+import {BackgroundGeolocationPlugin} from "@capacitor-community/background-geolocation";
 import {
     IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonFab, IonIcon, IonList,
     IonFabButton, IonLabel, IonItem, IonProgressBar, IonText, IonModal, IonButton, IonInput, IonGrid, IonRow, IonCol, IonPopover, useIonToast, withIonLifeCycle,
@@ -16,7 +18,7 @@ type GpsTabProps = {
 }
 
 type GpsTabState = {
-    watchId: number,
+    watchId: string,
     positions: MyPosition[],
     distance: number,
     previousPosition: MyPosition | undefined,
@@ -25,6 +27,8 @@ type GpsTabState = {
     intervalId: any | undefined,
     timeElapsed: number
 }
+
+const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>("BackgroundGeolocation");
 
 class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
 
@@ -38,13 +42,14 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
             previousPosition: undefined,
             accuracy: 0,
             measurements: 0,
-            watchId: 0,
+            watchId: "0",
             intervalId: 0,
             timeElapsed: 0
         };
 
         this.onLocationUpdate = this.onLocationUpdate.bind(this);
         this.updateTime = this.updateTime.bind(this);
+        this.onCallback = this.onCallback.bind(this);
     }
 
     ionViewDidEnter() {
@@ -57,10 +62,10 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
 
     onLocationUpdate(position: any) {
         console.log(position);
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        const timestamp = position.timestamp;
-        const accuracy = position.coords.accuracy;
+        const lat = position.latitude;
+        const lon = position.longitude;
+        const timestamp = position.time;
+        const accuracy = position.accuracy;
         
         // discard low accuracy measurements
         if (accuracy > 10.0) {
@@ -86,10 +91,6 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         })
 
         this.updateDistance(10);
-    }
-
-    onLocationError(err: any) {
-        console.log(err);
     }
 
     measureDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -136,22 +137,63 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
             previousPosition: undefined,
             accuracy: 0,
             measurements: 0,
-            watchId: 0,
+            watchId: "0",
             intervalId: 0,
             timeElapsed: 0
         })
         
-        const options = {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-        };
-
-        const watch = navigator.geolocation.watchPosition(this.onLocationUpdate, this.onLocationError, options);
         const interval = setInterval(this.updateTime, 1000);
         this.setState({
-            watchId: watch,
             intervalId: interval
+        });
+        
+        BackgroundGeolocation.addWatcher(
+        {
+            // If the "backgroundMessage" option is defined, the watcher will
+            // provide location updates whether the app is in the background or the
+            // foreground. If it is not defined, location updates are only
+            // guaranteed in the foreground. This is true on both platforms.
+
+            // On Android, a notification must be shown to continue receiving
+            // location updates in the background. This option specifies the text of
+            // that notification.
+            backgroundMessage: "Drive - Background GPS Measurement in Progress.",
+
+            // The title of the notification mentioned above. Defaults to "Using
+            // your location".
+            backgroundTitle: "Drive is watching you",
+
+            // Whether permissions should be requested from the user automatically,
+            // if they are not already granted. Defaults to "true".
+            requestPermissions: true,
+
+            // If "true", stale locations may be delivered while the device
+            // obtains a GPS fix. You are responsible for checking the "time"
+            // property. If "false", locations are guaranteed to be up to date.
+            // Defaults to "false".
+            stale: false,
+
+            // The minimum number of metres between subsequent locations. Defaults
+            // to 0.
+            distanceFilter: 0
+        },
+        this.onCallback
+    ).then(watcher_id => this.setWatchId(watcher_id))
+    }
+    
+    onCallback(location: any, error: any) {
+      if (location) {
+        console.log("my location is: " + location.longitude + ", " + location.latitude);
+        this.onLocationUpdate(location);
+      } else {
+        console.log("location is undefined");
+      }
+    }
+    
+    setWatchId(watcher_id: any) {
+        console.log("set watch id to: " + watcher_id);
+        this.setState({
+            watchId: watcher_id
         });
     }
     
@@ -162,7 +204,9 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
     }
     
     stop() {
-        navigator.geolocation.clearWatch(this.state.watchId);
+         BackgroundGeolocation.removeWatcher({
+            id: this.state.watchId
+        });
         this.updateDistance(2);
         clearInterval(this.state.intervalId);
     }

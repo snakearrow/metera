@@ -9,6 +9,13 @@
   dependencies:
     "@types/cordova" "latest"
 
+"@awesome-cordova-plugins/foreground-service@^5.39.1":
+  "integrity" "sha512-93Lxan32AhglxugbDtzD93Jd6XrYtp6GqZTKViIENfYkdLG9JzsNxkdZ69L/SIbsBBlntXcJCa4jOdyIIGTBTw=="
+  "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/foreground-service/-/foreground-service-5.39.1.tgz"
+  "version" "5.39.1"
+  dependencies:
+    "@types/cordova" "latest"
+
 "@awesome-cordova-plugins/geolocation@^5.39.0":
   "integrity" "sha512-ydF58Wq6duqWSG2NyyOcQOx2ite3wTsXxoPmGDRQ2KhxDed9pSgPBaqVKjEw6n/z7QVjgpph+q04gshXAdjGjA=="
   "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/geolocation/-/geolocation-5.39.0.tgz"
@@ -1098,6 +1105,11 @@
   "resolved" "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   "version" "0.2.3"
 
+"@capacitor-community/background-geolocation@^1.1.0":
+  "integrity" "sha512-4iPSV88VyxqLhzTkGav1TNHH/GDyQjCVYif1nu1+tvhcTJBD9z9YKLA6zb59PdFLsHw0bOa9vWzOyqpHyg4Vkw=="
+  "resolved" "https://registry.npmjs.org/@capacitor-community/background-geolocation/-/background-geolocation-1.1.0.tgz"
+  "version" "1.1.0"
+
 "@capacitor/android@3.3.4":
   "integrity" "sha512-5eaiZr79Dm1MNBjszVBXx8Io8YH+/RyFS6ix6V2LaKC4xj4i24kBJug5AHV4UbBBr9e/+RsAE9sui+SlkB1jNg=="
   "resolved" "https://registry.npmjs.org/@capacitor/android/-/android-3.3.4.tgz"
@@ -1130,7 +1142,7 @@
     "tslib" "^2.1.0"
     "xml2js" "^0.4.23"
 
-"@capacitor/core@^3.0.0", "@capacitor/core@^3.3.0", "@capacitor/core@^3.3.3":
+"@capacitor/core@^3.0.0", "@capacitor/core@^3.1.1", "@capacitor/core@^3.3.0", "@capacitor/core@^3.3.3":
   "integrity" "sha512-5oN3dUxdVXSvrTvTkmKBoBh7qISi+PVrsxHyjqq7Kr573dQnm8LsZ0/24PpJsGp08lD/+nFtFzOtPODJvYLVgg=="
   "resolved" "https://registry.npmjs.org/@capacitor/core/-/core-3.3.3.tgz"
   "version" "3.3.3"
@@ -1244,6 +1256,13 @@
 "@ionic-native/core@^5.1.0":
   "integrity" "sha512-lOrkktadlKYbYf1LrDyAtsu1JnQ0oCCdkOU7iHQ8oXnNOkMwobFfD2m62F1CoOr0u9LIkpYnZSPjng8lZbmbNw=="
   "resolved" "https://registry.npmjs.org/@ionic-native/core/-/core-5.36.0.tgz"
+  "version" "5.36.0"
+  dependencies:
+    "@types/cordova" "latest"
+
+"@ionic-native/foreground-service@^5.36.0":
+  "integrity" "sha512-2kQz+81Q8gyPIS+X7mt5Eth6HmeAmSBdRf04CWyO6lZwHneW9nRLlFwJBKlhISqLSxeJGpUGPwVc6E4QC70XBA=="
+  "resolved" "https://registry.npmjs.org/@ionic-native/foreground-service/-/foreground-service-5.36.0.tgz"
   "version" "5.36.0"
   dependencies:
     "@types/cordova" "latest"
@@ -3804,6 +3823,11 @@
   "integrity" "sha1-Z29us8OZl8LuGsOpJP1hJHSPV40="
   "resolved" "https://registry.npmjs.org/copy-descriptor/-/copy-descriptor-0.1.1.tgz"
   "version" "0.1.1"
+
+"cordova-plugin-foreground-service@^1.1.3":
+  "integrity" "sha512-/C2Z8w9JIfAaLeXP290msQP9jcHR+CAJYbp6/x+mS21VtvS2Ug0upKsgjEzzSzRnt08Mr8kuwCV7juUd6eCWcw=="
+  "resolved" "https://registry.npmjs.org/cordova-plugin-foreground-service/-/cordova-plugin-foreground-service-1.1.3.tgz"
+  "version" "1.1.3"
 
 "cordova-plugin-geolocation@^4.1.0":
   "integrity" "sha512-y5io/P10xGMxSn2KEqfv/fExK47eA1pmSonJdmDqDsaSADV9JpgdPx0mUSA08+5pzma/OS9R0LoODeDPx7Jvjg=="
