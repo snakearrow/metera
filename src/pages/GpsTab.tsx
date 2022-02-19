@@ -121,7 +121,7 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
                 totalDistance += diff;
             }
             this.setState({
-                distance: totalDistance,
+                distance: this.state.distance + totalDistance,
                 positions: [],
                 measurements: this.state.measurements + 1
             });
