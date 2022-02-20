@@ -6,6 +6,7 @@ import { BackgroundGeolocationPlugin } from "@capacitor-community/background-geo
 import {
     IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonFab, IonIcon, IonList,
     IonFabButton, IonLabel, IonItem, IonProgressBar, IonText, IonModal, IonButton, IonInput, IonGrid, IonRow, IonCol, IonPopover, useIonToast, withIonLifeCycle,
+    IonListHeader
 } from '@ionic/react';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Insomnia } from '@awesome-cordova-plugins/insomnia';
@@ -27,6 +28,7 @@ type GpsTabState = {
     accuracy: number,
     measurements: number,
     intervalId: any | undefined,
+    startTimestamp: Date | undefined,
     timeElapsed: number
 }
 
@@ -46,6 +48,7 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
             measurements: 0,
             watchId: "0",
             intervalId: 0,
+            startTimestamp: undefined,
             timeElapsed: 0
         };
 
@@ -160,14 +163,16 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
             measurements: 0,
             watchId: "0",
             intervalId: 0,
+            startTimestamp: undefined,
             timeElapsed: 0
         });
 
         const interval = setInterval(this.updateTime, 1000);
         this.setState({
-            intervalId: interval
+            intervalId: interval,
+            startTimestamp: new Date()
         });
-
+        
         BackgroundGeolocation.addWatcher(
             {
                 // If the "backgroundMessage" option is defined, the watcher will
@@ -179,11 +184,11 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
                 // On Android, a notification must be shown to continue receiving
                 // location updates in the background. This option specifies the text of
                 // that notification.
-                backgroundMessage: "Drive - Background GPS Measurement in Progress.",
+                backgroundMessage: "Metera - Background GPS Tracking in Progress",
 
                 // The title of the notification mentioned above. Defaults to "Using
                 // your location".
-                backgroundTitle: "Drive is watching you",
+                backgroundTitle: "Metera GPS Tracking in Progress",
 
                 // Whether permissions should be requested from the user automatically,
                 // if they are not already granted. Defaults to "true".
@@ -228,15 +233,20 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
     }
 
     setWatchId(watcher_id: any) {
-        console.log("set watch id to: " + watcher_id);
         this.setState({
             watchId: watcher_id
         });
     }
 
     updateTime() {
+        if (this.state.startTimestamp === undefined) {
+          return;
+        }
+        const now = new Date();
+        const diffInSec = (now.getTime() - this.state.startTimestamp.getTime())/1000;
+        
         this.setState({
-            timeElapsed: this.state.timeElapsed + 1
+            timeElapsed: Math.floor(diffInSec)
         });
     }
 
@@ -256,19 +266,41 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         const date = new Date(unixTimestamp).toLocaleTimeString("de-DE");
         return date;
     }
+    
+    timeElapsedAsString() {
+      const t = this.state.timeElapsed;
+      const seconds = Math.floor(t%60);
+      const secondsStr = seconds < 10 ? "0" + seconds : seconds;
+      const minutes = Math.floor(t/60);
+      const minutesStr = minutes < 10 ? "0" + minutes : minutes;
+      const hours = Math.floor(minutes/60);
+      const hoursStr = hours < 10 ? "0" + hours : hours;
+      return hoursStr + ":" + minutesStr + ":" + secondsStr;
+    }
 
     render() {
         return (
             <IonPage>
                 <IonContent>
-                    <br />
-                    <IonButton color="success" onClick={e => this.start()}>Start</IonButton>
-                    <IonButton color="danger" onClick={e => this.stop()}>Stop</IonButton><br />
-                    <IonLabel>{this.state.distance} m</IonLabel><br />
-                    <IonLabel>Accuracy: {this.state.accuracy} m</IonLabel><br />
-                    <IonLabel>Measurements: {this.state.measurements}</IonLabel><br />
-                    <IonLabel>Last update: {this.getLastUpdateTime()}</IonLabel><br />
-                    <IonLabel>Time elapsed: {(this.state.timeElapsed / 60.0).toFixed(1)}m</IonLabel>
+                    <IonList>
+                        <IonListHeader class="label-heading">Record Trip via GPS</IonListHeader>
+                    </IonList>
+                    <IonButton color="success" expand="block" onClick={e => this.start()} style={{width:180, height: 40}}>Start</IonButton><br/>
+                    <IonButton color="danger" expand="block" onClick={e => this.stop()} style={{width:180, height: 40}}>Stop</IonButton>
+                    <IonList>
+                        <IonItem lines="none">
+                          <IonLabel>Distance: {(this.state.distance/1000.0).toFixed(2)} km</IonLabel>
+                        </IonItem>
+                        <IonItem lines="none">
+                          <IonLabel>Accuracy: {this.state.accuracy} m</IonLabel>
+                        </IonItem>
+                        <IonItem lines="none">
+                          <IonLabel>Last GPS Update: {this.getLastUpdateTime()}</IonLabel>
+                        </IonItem>
+                        <IonItem lines="none">
+                          <IonLabel>Time elapsed: {this.timeElapsedAsString()}</IonLabel>
+                        </IonItem>
+                    </IonList>
                 </IonContent>
             </IonPage>
         )
