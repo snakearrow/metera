@@ -30,6 +30,20 @@
   dependencies:
     "@types/cordova" "latest"
 
+"@awesome-cordova-plugins/location-accuracy@^5.39.1":
+  "integrity" "sha512-CiocZlmR+fkJO4qVotbF4C8i7mtm7uHR8MiQI3BaaVrhQKmQoi70pstJonmBFhONVx3b69bMHoSc05z5A7zxVg=="
+  "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/location-accuracy/-/location-accuracy-5.39.1.tgz"
+  "version" "5.39.1"
+  dependencies:
+    "@types/cordova" "latest"
+
+"@awesome-cordova-plugins/toast@^5.39.1":
+  "integrity" "sha512-Z10/PDQcUUzpPHqBY6onN7Os2ed+EDuZ6TvnoW85LETbFxhD95rbjDeOtmxOb4ETaT/G6055Y1p0w/t8nZSoWw=="
+  "resolved" "https://registry.npmjs.org/@awesome-cordova-plugins/toast/-/toast-5.39.1.tgz"
+  "version" "5.39.1"
+  dependencies:
+    "@types/cordova" "latest"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.16.0", "@babel/code-frame@^7.5.5":
   "integrity" "sha512-IF4EOMEV+bfYwOmNxGzSnjR2EmQod7f1UXOpZM3l4i4o4QNwzjtJAu/HxdjHq0aYBvdqMuQEY1eg0nqW9ZPORA=="
   "resolved" "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.16.0.tgz"
@@ -1260,6 +1274,13 @@
   dependencies:
     "@types/cordova" "latest"
 
+"@ionic-native/diagnostic@^5.36.0":
+  "integrity" "sha512-ovzydKPNNK3zu1A0e9Z+cc8oSKaVmuV6DxCE82+KSyPddZzHuzZq/56us39WjlqQ07KDDKLwlGmIib9VGB1Y/A=="
+  "resolved" "https://registry.npmjs.org/@ionic-native/diagnostic/-/diagnostic-5.36.0.tgz"
+  "version" "5.36.0"
+  dependencies:
+    "@types/cordova" "latest"
+
 "@ionic-native/foreground-service@^5.36.0":
   "integrity" "sha512-2kQz+81Q8gyPIS+X7mt5Eth6HmeAmSBdRf04CWyO6lZwHneW9nRLlFwJBKlhISqLSxeJGpUGPwVc6E4QC70XBA=="
   "resolved" "https://registry.npmjs.org/@ionic-native/foreground-service/-/foreground-service-5.36.0.tgz"
@@ -1270,6 +1291,13 @@
 "@ionic-native/geolocation@^5.36.0":
   "integrity" "sha512-Fk7YXBn9/dOBGqtySSQgoCg7OLlmS8M6Y1Xa3hjgZBzFU0NPb9nnhVuMWI5Wp2qH/7cuzWRB7kEp4oN2tZ6fbw=="
   "resolved" "https://registry.npmjs.org/@ionic-native/geolocation/-/geolocation-5.36.0.tgz"
+  "version" "5.36.0"
+  dependencies:
+    "@types/cordova" "latest"
+
+"@ionic-native/location-accuracy@^5.36.0":
+  "integrity" "sha512-DnUsU7bxiD6TafzxX+ZQNPosjUO4JibZucUB0tvzFDmhm6osTI85svEMSukpUQgvjW+Kp636AzXlzaV7C7KHJw=="
+  "resolved" "https://registry.npmjs.org/@ionic-native/location-accuracy/-/location-accuracy-5.36.0.tgz"
   "version" "5.36.0"
   dependencies:
     "@types/cordova" "latest"
@@ -3838,6 +3866,16 @@
   "integrity" "sha1-gyoz9tdj8LgCc733YbNbZ4xDuVc="
   "resolved" "https://registry.npmjs.org/cordova-plugin-insomnia/-/cordova-plugin-insomnia-4.3.0.tgz"
   "version" "4.3.0"
+
+"cordova-plugin-request-location-accuracy@^2.3.0":
+  "integrity" "sha512-Rgr3DnRC8PUQyxmsOs76KxvDJB28MoCoYFfceiGn9Nzwsg6nAJmAwEtrYzm283x1cDhBPvzkZ6lzuldTkmnWjA=="
+  "resolved" "https://registry.npmjs.org/cordova-plugin-request-location-accuracy/-/cordova-plugin-request-location-accuracy-2.3.0.tgz"
+  "version" "2.3.0"
+
+"cordova-plugin-x-toast@^2.7.3":
+  "integrity" "sha512-+1aV7wJZpJdeZKTbBiagGawAJq7LOA4TFD6Et1uyTz+OUr3F4url8mXS+qLsag6kBCRftWg9WTA2bZTZv4tBjw=="
+  "resolved" "https://registry.npmjs.org/cordova-plugin-x-toast/-/cordova-plugin-x-toast-2.7.3.tgz"
+  "version" "2.7.3"
 
 "core-js-compat@^3.18.0", "core-js-compat@^3.19.1":
   "integrity" "sha512-AVhKZNpqMV3Jz8hU0YEXXE06qoxtQGsAqU0u1neUngz5IusDJRX/ZJ6t3i7mS7QxNyEONbCo14GprkBrxPlTZA=="

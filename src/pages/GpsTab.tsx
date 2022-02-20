@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Storage } from '@capacitor/storage';
-import {registerPlugin} from "@capacitor/core";
-import {BackgroundGeolocationPlugin} from "@capacitor-community/background-geolocation";
+import { registerPlugin } from "@capacitor/core";
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
+import { BackgroundGeolocationPlugin } from "@capacitor-community/background-geolocation";
 import {
     IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonFab, IonIcon, IonList,
     IonFabButton, IonLabel, IonItem, IonProgressBar, IonText, IonModal, IonButton, IonInput, IonGrid, IonRow, IonCol, IonPopover, useIonToast, withIonLifeCycle,
 } from '@ionic/react';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Insomnia } from '@awesome-cordova-plugins/insomnia';
+import { Toast } from '@awesome-cordova-plugins/toast';
 
 import './GpsTab.css';
 
@@ -66,10 +68,10 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         const lon = position.longitude;
         const timestamp = position.time;
         const accuracy = position.accuracy;
-        
+
         // discard low accuracy measurements
         if (accuracy > 10.0) {
-          return;
+            return;
         }
 
         // check if we can discard this measurement because of (almost) zero movement
@@ -128,89 +130,124 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
             });
         }
     }
-    
-    start() {
+
+    async askToTurnOnGPS(): Promise<boolean> {
+        return await new Promise((resolve, reject) => {
+            LocationAccuracy.canRequest().then((canRequest: boolean) => {
+                if (canRequest) {
+                    LocationAccuracy.request(LocationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+                        () => {
+                            resolve(true);
+                        },
+                        error => {
+                            resolve(false);
+                        }
+                    );
+                }
+                else { resolve(false); }
+            });
+        })
+    }
+
+    clearToStart() {
         // reset state
         this.setState({
             positions: [],
             distance: 0,
+
             previousPosition: undefined,
             accuracy: 0,
             measurements: 0,
             watchId: "0",
             intervalId: 0,
             timeElapsed: 0
-        })
-        
+        });
+
         const interval = setInterval(this.updateTime, 1000);
         this.setState({
             intervalId: interval
         });
-        
+
         BackgroundGeolocation.addWatcher(
-        {
-            // If the "backgroundMessage" option is defined, the watcher will
-            // provide location updates whether the app is in the background or the
-            // foreground. If it is not defined, location updates are only
-            // guaranteed in the foreground. This is true on both platforms.
+            {
+                // If the "backgroundMessage" option is defined, the watcher will
+                // provide location updates whether the app is in the background or the
+                // foreground. If it is not defined, location updates are only
+                // guaranteed in the foreground. This is true on both platforms.
 
-            // On Android, a notification must be shown to continue receiving
-            // location updates in the background. This option specifies the text of
-            // that notification.
-            backgroundMessage: "Drive - Background GPS Measurement in Progress.",
 
-            // The title of the notification mentioned above. Defaults to "Using
-            // your location".
-            backgroundTitle: "Drive is watching you",
+                // On Android, a notification must be shown to continue receiving
+                // location updates in the background. This option specifies the text of
+                // that notification.
+                backgroundMessage: "Drive - Background GPS Measurement in Progress.",
 
-            // Whether permissions should be requested from the user automatically,
-            // if they are not already granted. Defaults to "true".
-            requestPermissions: true,
+                // The title of the notification mentioned above. Defaults to "Using
+                // your location".
+                backgroundTitle: "Drive is watching you",
 
-            // If "true", stale locations may be delivered while the device
-            // obtains a GPS fix. You are responsible for checking the "time"
-            // property. If "false", locations are guaranteed to be up to date.
-            // Defaults to "false".
-            stale: false,
+                // Whether permissions should be requested from the user automatically,
+                // if they are not already granted. Defaults to "true".
+                requestPermissions: true,
 
-            // The minimum number of metres between subsequent locations. Defaults
-            // to 0.
-            distanceFilter: 0
-        },
-        this.onCallback
-    ).then(watcher_id => this.setWatchId(watcher_id))
+                // If "true", stale locations may be delivered while the device
+                // obtains a GPS fix. You are responsible for checking the "time"
+                // property. If "false", locations are guaranteed to be up to date.
+                // Defaults to "false".
+                stale: false,
+
+                // The minimum number of metres between subsequent locations. Defaults
+                // to 0.
+                distanceFilter: 0
+            },
+            this.onCallback
+        ).then(watcher_id => this.setWatchId(watcher_id))
     }
-    
+
     onCallback(location: any, error: any) {
-      if (location) {
-        console.log("my location is: " + location.longitude + ", " + location.latitude);
-        this.onLocationUpdate(location);
-      } else {
-        console.log("location is undefined");
-      }
+        if (location) {
+            console.log("my location is: " + location.longitude + ", " + location.latitude);
+            this.onLocationUpdate(location);
+        } else {
+            console.log("location is undefined");
+        }
     }
-    
+
+    start() {
+        this.askToTurnOnGPS().then(result => {
+            if (result) {
+                this.clearToStart();
+            } else {
+                // GPS disabled, cannot proceed
+                Toast.show(`GPS needed to continue.`, '5000', 'bottom').subscribe(
+                    toast => {
+                        console.log(toast);
+                    });
+                return;
+            }
+        });
+    }
+
     setWatchId(watcher_id: any) {
         console.log("set watch id to: " + watcher_id);
         this.setState({
             watchId: watcher_id
         });
     }
-    
+
     updateTime() {
         this.setState({
-            timeElapsed: this.state.timeElapsed+1
+            timeElapsed: this.state.timeElapsed + 1
         });
     }
-    
+
     stop() {
-         BackgroundGeolocation.removeWatcher({
+        BackgroundGeolocation.removeWatcher({
             id: this.state.watchId
         });
         this.updateDistance(2);
         clearInterval(this.state.intervalId);
     }
-    
+
     getLastUpdateTime() {
         if (this.state.previousPosition === undefined) {
             return "n/a";
@@ -219,19 +256,19 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         const date = new Date(unixTimestamp).toLocaleTimeString("de-DE");
         return date;
     }
-    
+
     render() {
         return (
             <IonPage>
                 <IonContent>
-                    <br/>
+                    <br />
                     <IonButton color="success" onClick={e => this.start()}>Start</IonButton>
-                    <IonButton color="danger" onClick={e => this.stop()}>Stop</IonButton><br/>
+                    <IonButton color="danger" onClick={e => this.stop()}>Stop</IonButton><br />
                     <IonLabel>{this.state.distance} m</IonLabel><br />
-                    <IonLabel>Accuracy: {this.state.accuracy} m</IonLabel><br/>
-                    <IonLabel>Measurements: {this.state.measurements}</IonLabel><br/>
-                    <IonLabel>Last update: {this.getLastUpdateTime()}</IonLabel><br/>
-                    <IonLabel>Time elapsed: {(this.state.timeElapsed/60.0).toFixed(1)}m</IonLabel>
+                    <IonLabel>Accuracy: {this.state.accuracy} m</IonLabel><br />
+                    <IonLabel>Measurements: {this.state.measurements}</IonLabel><br />
+                    <IonLabel>Last update: {this.getLastUpdateTime()}</IonLabel><br />
+                    <IonLabel>Time elapsed: {(this.state.timeElapsed / 60.0).toFixed(1)}m</IonLabel>
                 </IonContent>
             </IonPage>
         )
