@@ -21,6 +21,8 @@ type GpsTabProps = {
 }
 
 type GpsTabState = {
+    running: boolean,
+    paused: boolean
     watchId: string,
     positions: MyPosition[],
     distance: number,
@@ -37,10 +39,11 @@ const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>("Backg
 class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
 
 
-
     constructor(props: any) {
         super(props);
         this.state = {
+            running: false,
+            paused: false,
             positions: [],
             distance: 0,
             previousPosition: undefined,
@@ -157,7 +160,8 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         this.setState({
             positions: [],
             distance: 0,
-
+            running: true,
+            paused: false,
             previousPosition: undefined,
             accuracy: 0,
             measurements: 0,
@@ -209,6 +213,9 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
     }
 
     onCallback(location: any, error: any) {
+        if (this.state.paused) {
+          return;
+        }
         if (location) {
             console.log("my location is: " + location.longitude + ", " + location.latitude);
             this.onLocationUpdate(location);
@@ -217,7 +224,22 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         }
     }
 
-    start() {
+    startOrPause() {
+        if (this.state.running) {
+          this.setState({
+            running: false,
+            paused: true
+          });
+          return;
+        }
+        if (this.state.paused) {
+          this.setState({
+            running: true,
+            paused: false
+          });
+          return;
+        }
+        
         this.askToTurnOnGPS().then(result => {
             if (result) {
                 this.clearToStart();
@@ -251,6 +273,15 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
     }
 
     stop() {
+        if (!this.state.running && !this.state.paused) {
+          return;
+        }
+        this.setState({
+          running: false,
+          paused: false
+        });
+        console.log("stopping...");
+        
         BackgroundGeolocation.removeWatcher({
             id: this.state.watchId
         });
@@ -285,7 +316,8 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
                     <IonList>
                         <IonListHeader class="label-heading">Record Trip via GPS</IonListHeader>
                     </IonList>
-                    <IonButton color="success" expand="block" onClick={e => this.start()} style={{width:180, height: 40}}>Start</IonButton><br/>
+                    <IonButton color="success" expand="block" onClick={e => this.startOrPause()} style={{width:180, height: 40}}>
+                      {this.state.running ? "Pause" : (this.state.paused ? "Resume" : "Start")}</IonButton><br/>
                     <IonButton color="danger" expand="block" onClick={e => this.stop()} style={{width:180, height: 40}}>Stop</IonButton>
                     <IonList>
                         <IonItem lines="none">
