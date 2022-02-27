@@ -8,6 +8,8 @@ import {
     IonFabButton, IonLabel, IonItem, IonProgressBar, IonText, IonModal, IonButton, IonInput, IonGrid, IonRow, IonCol, IonPopover, useIonToast, withIonLifeCycle,
     IonListHeader
 } from '@ionic/react';
+import { saveCustomTrip } from '../util';
+import SaveGpsTripModal from '../components/SaveGpsTripModal';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Insomnia } from '@awesome-cordova-plugins/insomnia';
 import { Toast } from '@awesome-cordova-plugins/toast';
@@ -31,7 +33,8 @@ type GpsTabState = {
     measurements: number,
     intervalId: any | undefined,
     startTimestamp: Date | undefined,
-    timeElapsed: number
+    timeElapsed: number,
+    showSaveGpsTripModal: boolean
 }
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>("BackgroundGeolocation");
@@ -52,12 +55,14 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
             watchId: "0",
             intervalId: 0,
             startTimestamp: undefined,
-            timeElapsed: 0
+            timeElapsed: 0,
+            showSaveGpsTripModal: false
         };
 
         this.onLocationUpdate = this.onLocationUpdate.bind(this);
         this.updateTime = this.updateTime.bind(this);
         this.onCallback = this.onCallback.bind(this);
+        this.closeSaveGpsTripModal = this.closeSaveGpsTripModal.bind(this);
     }
 
     ionViewDidEnter() {
@@ -287,6 +292,10 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
         });
         this.updateDistance(2);
         clearInterval(this.state.intervalId);
+        
+        this.setState({
+          showSaveGpsTripModal: true
+        });
     }
 
     getLastUpdateTime() {
@@ -307,6 +316,21 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
       const hours = Math.floor(minutes/60);
       const hoursStr = hours < 10 ? "0" + hours : hours;
       return hoursStr + ":" + minutesStr + ":" + secondsStr;
+    }
+    
+    closeSaveGpsTripModal(args: any) {
+      this.setState({
+        showSaveGpsTripModal: false
+      });
+      
+      if (args === undefined) {
+        return;
+      }
+      
+      const name = args[0];
+      const description = args[1];
+      const kilometers = parseFloat(args[2]);
+      saveCustomTrip(name, description, kilometers);
     }
 
     render() {
@@ -333,6 +357,10 @@ class GpsTab extends React.Component<GpsTabProps, GpsTabState> {
                           <IonLabel>Time elapsed: {this.timeElapsedAsString()}</IonLabel>
                         </IonItem>
                     </IonList>
+                    
+                    <IonModal isOpen={this.state.showSaveGpsTripModal}>
+                      <SaveGpsTripModal closeAction={this.closeSaveGpsTripModal} km={parseFloat((this.state.distance/1000.0).toFixed(2))}></SaveGpsTripModal> 
+                    </IonModal>
                 </IonContent>
             </IonPage>
         )
